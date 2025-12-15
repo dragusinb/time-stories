@@ -1,0 +1,26 @@
+import { Navbar } from '@/components/Navbar';
+import { StoryReader } from '@/components/StoryReader';
+import { getStory } from '@/lib/data';
+import { notFound } from 'next/navigation';
+
+interface PageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default async function ReadPage({ params }: PageProps) {
+    const { id } = await params;
+    const story = getStory(id);
+
+    if (!story) {
+        notFound();
+    }
+
+    return (
+        <main className="min-h-screen bg-slate-950">
+            <Navbar />
+            <div className="container mx-auto px-4 py-8">
+                <StoryReader story={story} />
+            </div>
+        </main>
+    );
+}

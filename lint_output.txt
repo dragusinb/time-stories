@@ -1,0 +1,55 @@
+
+> time-stories@0.1.0 lint
+> eslint --no-color
+
+
+C:\OldD\_Projects\TimeStories\app\store\page.tsx
+  109:0  error  Parsing error: Declaration or statement expected
+
+C:\OldD\_Projects\TimeStories\app\story\[id]\page.tsx
+  6:10  warning  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\OldD\_Projects\TimeStories\components\StoryCard.tsx
+  5:10  warning  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\OldD\_Projects\TimeStories\components\StoryReader.tsx
+  4:17  warning  'Act' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\OldD\_Projects\TimeStories\components\minigames\MemoryGame.tsx
+  41:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\OldD\_Projects\TimeStories\components\minigames\MemoryGame.tsx:41:9
+  39 |         // Shuffle the cards
+  40 |         const shuffled = [...gameCards].sort(() => Math.random() - 0.5);
+> 41 |         setCards(shuffled);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  42 |     }, [options]);
+  43 |
+  44 |     const handleCardClick = (id: number) => {  react-hooks/set-state-in-effect
+
+C:\OldD\_Projects\TimeStories\components\ui\ParticleOverlay.tsx
+  17:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\OldD\_Projects\TimeStories\components\ui\ParticleOverlay.tsx:17:9
+  15 |             duration: Math.random() * 10 + 10, // 10-20s
+  16 |         }));
+> 17 |         setParticles(newParticles);
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |     }, []);
+  19 |
+  20 |     return (  react-hooks/set-state-in-effect
+
+✖ 6 problems (3 errors, 3 warnings)
+
