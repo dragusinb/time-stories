@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Minigame } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Ship as ShipIcon, Waves, Anchor, Hammer } from 'lucide-react';
 
 interface DefenseGameProps {
     minigame: Minigame;
@@ -20,45 +21,47 @@ interface Ship {
 export const DefenseGame: React.FC<DefenseGameProps> = ({ minigame, onComplete }) => {
     const [ships, setShips] = useState<Ship[]>([]);
     const [score, setScore] = useState(0);
-    const [clawPos, setClawPos] = useState<{ x: number, y: number } | null>(null);
-    const [shake, setShake] = useState(false);
+    const [clawState, setClawState] = useState<'idle' | 'dropping' | 'grabbing' | 'retracting'>('idle');
+    const [clawTarget, setClawTarget] = useState<{ x: number, y: number } | null>(null);
     const [message, setMessage] = useState("TAP SHIPS TO DEPLOY CLAW");
 
-    // Game loop refs
+    // Refs for loop
     const requestRef = useRef<number | null>(null);
     const lastSpawnRef = useRef(0);
     const scoreRef = useRef(0);
 
-    const SPAWN_RATE = 1500;
+    const WIN_SCORE = 5;
+    const SPAWN_RATE = 1800;
 
+    // Game Loop
     useEffect(() => {
         const animate = (time: number) => {
-            if (scoreRef.current >= 5) return;
+            if (scoreRef.current >= WIN_SCORE) return;
 
-            // Spawn
+            // Spawn Logic
             if (time - lastSpawnRef.current > SPAWN_RATE) {
                 setShips(prev => [
                     ...prev,
                     {
                         id: Date.now(),
-                        x: -15,
-                        y: 55 + Math.random() * 25, // Lower in water
-                        speed: 0.15 + Math.random() * 0.15,
+                        x: -15, // Start off-screen left
+                        y: 60 + Math.random() * 20, // Water level variation
+                        speed: 0.08 + Math.random() * 0.05,
                         isSunk: false,
-                        type: Math.random() > 0.7 ? 'flagship' : 'galley'
+                        type: Math.random() > 0.8 ? 'flagship' : 'galley'
                     }
                 ]);
                 lastSpawnRef.current = time;
             }
 
-            // Move
+            // Move Ships
             setShips(prev =>
                 prev
                     .map(ship => ({
                         ...ship,
                         x: ship.isSunk ? ship.x : ship.x + ship.speed
                     }))
-                    .filter(ship => ship.x < 110)
+                    .filter(ship => ship.x < 110) // Remove when off-screen right
             );
 
             requestRef.current = requestAnimationFrame(animate);
@@ -68,149 +71,186 @@ export const DefenseGame: React.FC<DefenseGameProps> = ({ minigame, onComplete }
         return () => cancelAnimationFrame(requestRef.current!);
     }, []);
 
-    const handleShipClick = (e: React.MouseEvent, ship: Ship) => {
-        e.stopPropagation();
-        if (ship.isSunk) return;
+    // Interaction Handler
+    const handleShipClick = (ship: Ship) => {
+        if (clawState !== 'idle' || ship.isSunk || scoreRef.current >= WIN_SCORE) return;
 
-        // Visuals
-        setClawPos({ x: ship.x, y: ship.y });
-        setShake(true);
-        setTimeout(() => setShake(false), 300);
+        // Start Attack Sequence
+        setClawState('dropping');
+        setClawTarget({ x: ship.x, y: ship.y });
 
-        // Logic
-        setShips(prev => prev.map(s => s.id === ship.id ? { ...s, isSunk: true } : s));
-        const newScore = score + 1;
-        setScore(newScore);
-        scoreRef.current = newScore;
+        // 1. Drop & Grab (Visual only first)
+        setTimeout(() => {
+            setClawState('grabbing');
 
-        if (newScore >= 5) {
-            setMessage("VICTORY! THE HARBOR IS SAFE!");
-            setTimeout(() => onComplete(true), 2500);
-        } else {
-            setMessage(`SUNK: ${newScore}/5`);
-            setTimeout(() => setClawPos(null), 800);
-        }
+            // 2. Resolve Hit
+            setShips(prev => prev.map(s => s.id === ship.id ? { ...s, isSunk: true } : s));
+            const newScore = score + 1;
+            setScore(newScore);
+            scoreRef.current = newScore;
+
+            // 3. Victory Check
+            if (newScore >= WIN_SCORE) {
+                setMessage("VICTORY! THE HARBOR IS SAFE!");
+                setTimeout(() => onComplete(true), 2500);
+            } else {
+                setMessage(`SHIPS SUNK: ${newScore}/${WIN_SCORE}`);
+            }
+
+            // 4. Retract
+            setTimeout(() => {
+                setClawState('retracting');
+                setTimeout(() => {
+                    setClawState('idle');
+                    setClawTarget(null);
+                }, 600);
+            }, 500);
+
+        }, 600); // Drop duration
     };
 
     return (
-        <div className={`flex flex-col items-center space-y-4 p-1 bg-[#1a110d] rounded-lg border-4 border-[#5e4026] shadow-2xl font-serif select-none transition-transform ${shake ? 'translate-x-[2px] translate-y-[2px]' : ''}`}>
+        <div className="relative w-full h-[500px] bg-[#87CEEB] overflow-hidden rounded-lg shadow-2xl border-4 border-[#5e4026] select-none">
+            {/* Sky / Background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB] to-[#E0F7FA] opacity-80"></div>
 
-            {/* Header / HUD */}
-            <div className="flex w-full justify-between items-center px-4 py-2 bg-[#2c1e16] border-b border-[#5e4026] rounded-t">
-                <div className="text-[#e6ccb2] font-bold tracking-widest text-sm">ARCHIMEDES' DEFENSE</div>
-                <div className="text-[#8b5a2b] font-mono text-xs">{message}</div>
-                <div className="text-amber-500 font-bold text-xl">{score}/5</div>
+            {/* City Wall (Background) */}
+            <div className="absolute right-0 bottom-32 w-48 h-64 bg-[#d4c5a3] border-l-4 border-[#8b7355]">
+                <div className="w-full h-8 bg-[#8b7355] mb-2"></div>
+                <div className="w-full h-4 bg-[#8b7355] mt-8 opacity-50"></div>
             </div>
 
-            {/* Game Viewport */}
-            <div className="relative w-full h-80 bg-[#87CEEB] overflow-hidden border-x-4 border-b-4 border-[#3e2723] shadow-inner group cursor-crosshair">
+            {/* Clouds */}
+            <motion.div
+                animate={{ x: [0, 100, 0] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute top-10 left-10 opacity-60"
+            >
+                <div className="w-24 h-8 bg-white rounded-full blur-md"></div>
+            </motion.div>
 
-                {/* Sky & Atmosphere */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB] via-[#aed9e7] to-[#4fa3d1] opacity-60"></div>
-                <div className="absolute top-4 right-8 w-16 h-16 bg-yellow-200 rounded-full blur-xl opacity-60 animate-pulse"></div>
+            {/* The Claw Mechanism (Top) */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
+                {/* Rope */}
+                <motion.div
+                    className="w-1 bg-[#4a3728] mx-auto"
+                    initial={{ height: 20 }}
+                    animate={{
+                        height: clawState !== 'idle' && clawTarget ? `${clawTarget.y}%` : 40,
+                        rotate: clawState !== 'idle' && clawTarget ? (clawTarget.x - 50) * 0.2 : 0
+                    }}
+                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                />
 
-                {/* City Wall (Foreground Left) */}
-                <div className="absolute bottom-0 left-0 w-24 h-full bg-[#5d4037] border-r-8 border-[#3e2723] z-40 shadow-2xl skew-x-2 origin-bottom">
-                    <div className="w-full h-full opacity-40 bg-[url('https://www.transparenttextures.com/patterns/brick-wall.png')]"></div>
-                    {/* Crane Base */}
-                    <div className="absolute top-10 right-0 w-8 h-64 bg-[#271c19] border-l border-[#4e342e]"></div>
-                </div>
+                {/* The Claw Hand */}
+                <motion.div
+                    className="relative -ml-6"
+                    initial={{ y: 20 }}
+                    animate={{
+                        y: clawState !== 'idle' && clawTarget ? window.innerHeight * (clawTarget.y / 100) * 0.5 : 20, // Simplified relative movement
+                        x: clawState !== 'idle' && clawTarget ? (clawTarget.x - 50) * 5 : 0,
+                    }}
+                    transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                >
+                    <div className={`
+                        w-12 h-12 border-4 border-[#5e4026] rounded-b-xl flex items-center justify-center bg-[#8b5a2b] shadow-xl
+                        ${clawState === 'grabbing' ? 'scale-90' : 'scale-100'}
+                        transition-transform duration-200
+                     `}>
+                        <Anchor className={`w-8 h-8 text-[#2c1e16] ${clawState === 'grabbing' ? 'rotate-180' : ''} transition-transform`} />
+                    </div>
+                    {/* Grabbers */}
+                    <motion.div
+                        animate={{ rotate: clawState === 'grabbing' ? -45 : 0 }}
+                        className="absolute -left-2 bottom-0 w-4 h-8 bg-[#4a3728] rounded-bl-full origin-top-right"
+                    />
+                    <motion.div
+                        animate={{ rotate: clawState === 'grabbing' ? 45 : 0 }}
+                        className="absolute -right-2 bottom-0 w-4 h-8 bg-[#4a3728] rounded-br-full origin-top-left"
+                    />
+                </motion.div>
+            </div>
 
-                {/* Water Layers (Parallax) */}
-                <div className="absolute bottom-0 w-[120%] -left-10 h-24 bg-[#4fa3d1] opacity-80 animate-wave-slow rounded-[100%] z-20 mix-blend-multiply"></div>
-                <div className="absolute -bottom-4 w-[120%] -left-10 h-20 bg-[#2b7095] opacity-70 animate-wave-fast rounded-[100%] z-20"></div>
-
-                {/* SHIPS */}
+            {/* Ships Layer */}
+            <div className="absolute inset-0 z-10">
                 <AnimatePresence>
                     {ships.map(ship => (
-                        <motion.button
-                            key={ship.id}
-                            initial={{ opacity: 0, left: '-10%', top: `${ship.y}%` }}
-                            animate={{ opacity: 1, left: `${ship.x}%`, top: `${ship.y}%` }}
-                            exit={{ opacity: 0, scale: 0 }}
-                            onClick={(e) => handleShipClick(e as any, ship)}
-                            className={`absolute z-30 w-32 h-20 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-in-out
-                                ${ship.isSunk ? 'rotate-[160deg] translate-y-24 grayscale opacity-50' : 'hover:scale-105 hover:brightness-110'}
-                            `}
-                        >
-                            {/* SVG ROMAN TRIREME */}
-                            <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-lg">
-                                {/* Sail */}
-                                <path d="M40,10 Q60,10 70,30 L30,30 Z" fill="#e6e6e6" stroke="#bcaaa4" strokeWidth="1" />
-                                <text x="45" y="25" fontSize="6" fill="#7f1d1d" fontWeight="bold">SPQR</text>
-                                {/* Mast */}
-                                <rect x="48" y="5" width="4" height="35" fill="#3e2723" />
-                                {/* Hull */}
-                                <path d="M10,35 Q50,60 90,30 L95,30 Q90,60 10,50 Z" fill="#5d4037" stroke="#3e2723" strokeWidth="2" />
-                                {/* Shields */}
-                                <circle cx="20" cy="38" r="3" fill="#b71c1c" stroke="#f59e0b" strokeWidth="1" />
-                                <circle cx="35" cy="40" r="3" fill="#b71c1c" stroke="#f59e0b" strokeWidth="1" />
-                                <circle cx="50" cy="41" r="3" fill="#b71c1c" stroke="#f59e0b" strokeWidth="1" />
-                                <circle cx="65" cy="40" r="3" fill="#b71c1c" stroke="#f59e0b" strokeWidth="1" />
-                                <circle cx="80" cy="38" r="3" fill="#b71c1c" stroke="#f59e0b" strokeWidth="1" />
-                            </svg>
-
-                            {/* SPLASH EFFECT ON SINK */}
-                            {ship.isSunk && (
-                                <motion.div
-                                    initial={{ opacity: 1, scale: 0 }}
-                                    animate={{ opacity: 0, scale: 2 }}
-                                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                                >
-                                    <div className="w-full h-full bg-blue-200 rounded-full opacity-50 blur-sm"></div>
-                                </motion.div>
-                            )}
-                        </motion.button>
-                    ))}
-                </AnimatePresence>
-
-                {/* THE CLAW */}
-                <AnimatePresence>
-                    {clawPos && (
                         <motion.div
-                            initial={{ y: -400 }}
-                            animate={{ y: 0 }}
-                            exit={{ y: -400 }}
-                            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                            className="absolute z-50 pointer-events-none"
+                            key={ship.id}
+                            className="absolute cursor-pointer"
                             style={{
-                                left: `${clawPos.x}%`,
-                                top: `${clawPos.y - 15}%`,
-                                x: '-50%'
+                                left: `${ship.x}%`,
+                                top: `${ship.y}%`,
                             }}
+                            animate={{
+                                rotate: ship.isSunk ? 45 : 0,
+                                y: ship.isSunk ? 100 : 0,
+                                opacity: ship.isSunk ? 0 : 1
+                            }}
+                            transition={ship.isSunk ? { duration: 1.5 } : { duration: 0 }}
+                            onClick={() => handleShipClick(ship)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                         >
-                            {/* Chain */}
-                            <div className="w-1 h-80 bg-stone-800 mx-auto border-x border-[#3e2723]"></div>
-                            {/* Claw Mechanism (Bronze) */}
-                            <div className="relative w-24 h-24 -mt-2">
-                                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-2xl">
-                                    <defs>
-                                        <linearGradient id="bronze" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#cd7f32" />
-                                            <stop offset="50%" stopColor="#a0522d" />
-                                            <stop offset="100%" stopColor="#8b4513" />
-                                        </linearGradient>
-                                    </defs>
-                                    {/* Hub */}
-                                    <circle cx="50" cy="20" r="10" fill="url(#bronze)" stroke="#3e2723" strokeWidth="2" />
-                                    {/* Left Claw */}
-                                    <path d="M40,25 Q10,50 30,80 L40,60" fill="url(#bronze)" stroke="#3e2723" strokeWidth="2" />
-                                    {/* Right Claw */}
-                                    <path d="M60,25 Q90,50 70,80 L60,60" fill="url(#bronze)" stroke="#3e2723" strokeWidth="2" />
-                                </svg>
+                            <div className={`relative ${ship.type === 'flagship' ? 'scale-125' : 'scale-100'}`}>
+                                <ShipIcon
+                                    className={`w-16 h-16 ${ship.type === 'flagship' ? 'text-red-800' : 'text-[#5e4026]'} fill-current drop-shadow-lg`}
+                                />
+                                {ship.type === 'flagship' && (
+                                    <div className="absolute -top-2 left-6 text-red-600 font-bold text-xs bg-white px-1 rounded border border-red-800">CMD</div>
+                                )}
                             </div>
                         </motion.div>
-                    )}
+                    ))}
                 </AnimatePresence>
-
             </div>
 
-            <style jsx>{`
-                @keyframes wave-slow { 0% { transform: translateX(0); } 100% { transform: translateX(-20px); } }
-                @keyframes wave-fast { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
-                .animate-wave-slow { animation: wave-slow 3s ease-in-out infinite alternate; }
-                .animate-wave-fast { animation: wave-fast 2s ease-in-out infinite alternate; }
-            `}</style>
+            {/* Water Layers (Foreground) */}
+            <div className="absolute bottom-0 w-full h-32 bg-[#4FC3F7] opacity-90 z-10 flex items-end overflow-hidden">
+                <motion.div
+                    animate={{ x: [-50, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    className="w-[200%] flex text-[#0288D1]"
+                >
+                    {Array.from({ length: 20 }).map((_, i) => (
+                        <Waves key={i} className="w-24 h-24 -mb-10 scale-150" />
+                    ))}
+                </motion.div>
+            </div>
+            <div className="absolute bottom-0 w-full h-20 bg-[#0288D1] opacity-80 z-20 flex items-end overflow-hidden">
+                <motion.div
+                    animate={{ x: [0, -50] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="w-[200%] flex text-[#01579B]"
+                >
+                    {Array.from({ length: 20 }).map((_, i) => (
+                        <Waves key={i} className="w-24 h-24 -mb-12 scale-150" />
+                    ))}
+                </motion.div>
+            </div>
+
+            {/* HUD */}
+            <div className="absolute top-4 left-4 z-30 bg-[#1a110d]/90 px-4 py-2 rounded border-2 border-[#8b5a2b] text-[#e6ccb2] font-serif shadow-lg">
+                <div className="text-sm tracking-widest uppercase mb-1">Defense Status</div>
+                <div className="text-2xl font-bold">{message}</div>
+                <div className="flex gap-1 mt-2">
+                    {Array.from({ length: WIN_SCORE }).map((_, i) => (
+                        <div key={i} className={`w-3 h-3 rounded-full ${i < score ? 'bg-green-500' : 'bg-[#4a3728]'}`} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Debug/Reset Button */}
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setScore(0); setShips([]); scoreRef.current = 0; }}
+                className="absolute top-4 right-4 z-30 opacity-50 hover:opacity-100 text-[#2c1e16]"
+            >
+                Reset
+            </Button>
         </div>
     );
 };
+
+
