@@ -28,7 +28,6 @@ import LensCraftingGame from './minigames/LensCraftingGame';
 import SymbolMatchingGame from './minigames/SymbolMatchingGame';
 import DebateGame from './minigames/DebateGame';
 import RitualGame from './minigames/RitualGame';
-import { DefenseGame } from './minigames/DefenseGame';
 import ConstellationGame from './minigames/ConstellationGame';
 import ChemistryGame from './minigames/ChemistryGame';
 import DiagnosisGame from './minigames/DiagnosisGame';
@@ -525,9 +524,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
         return <RitualGame minigame={minigame} onComplete={onComplete} />;
     }
 
-    if (minigame.type === 'defense') {
-        return <DefenseGame minigame={minigame} onComplete={onComplete} />;
-    }
+
 
     if (minigame.type === 'constellation') {
         return <ConstellationGame minigame={minigame} onComplete={onComplete} />;
