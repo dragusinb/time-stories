@@ -63,4 +63,5 @@ export interface UserState {
     coins: number;
     unlockedActs: string[]; // List of Act IDs
     completedMinigames: string[]; // List of Minigame IDs
+    completedStories: string[]; // List of Story IDs
 }

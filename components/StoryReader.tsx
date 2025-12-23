@@ -5,7 +5,7 @@ import { Story, Act, Minigame } from '@/types';
 import { useStore } from '@/lib/store';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
-import { Lock, ChevronRight, ChevronLeft, Brain } from 'lucide-react';
+import { Lock, ChevronRight, ChevronLeft, Brain, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { MemoryGame } from './minigames/MemoryGame';
@@ -44,7 +44,7 @@ export function StoryReader({ story }: StoryReaderProps) {
     const [currentActIndex, setCurrentActIndex] = useState(0);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
-    const { coins, unlockedActs, unlockAct, spendCoins, completedMinigames, completeMinigame } = useStore();
+    const { coins, unlockedActs, unlockAct, spendCoins, completedMinigames, completeMinigame, completeStory } = useStore();
 
     const currentAct = story.acts[currentActIndex];
     const isUnlocked = !currentAct.isLocked || unlockedActs.includes(currentAct.id);
@@ -88,6 +88,13 @@ export function StoryReader({ story }: StoryReaderProps) {
             window.location.hash = currentAct.id;
         }
     }, [currentAct.id, isInitialized]);
+
+    // Check for story completion
+    useEffect(() => {
+        if (currentActIndex === story.acts.length - 1 && isUnlocked) {
+            completeStory(story.id);
+        }
+    }, [currentActIndex, isUnlocked, story.id, story.acts.length, completeStory]);
 
     const handleUnlock = () => {
         if (spendCoins(currentAct.price)) {
@@ -363,20 +370,37 @@ export function StoryReader({ story }: StoryReaderProps) {
                             ></div>
                         </div>
 
-                        <Button
-                            variant={isUnlocked ? "primary" : "secondary"}
-                            onClick={nextAct}
-                            disabled={currentActIndex === story.acts.length - 1}
-                            className={`gap-2 uppercase tracking-widest 
-                                ${isApollo
-                                    ? 'bg-green-900 border-green-700 text-green-100 hover:bg-green-800'
-                                    : isArchimedes
-                                        ? 'bg-[#5e4026] text-[#e6ccb2] border-[#8b5a2b] hover:bg-[#704d2e]'
-                                        : ''}
-                            `}
-                        >
-                            Next <ChevronRight className="w-4 h-4" />
-                        </Button>
+                        {currentActIndex === story.acts.length - 1 ? (
+                            <Link href="/">
+                                <Button
+                                    variant="primary"
+                                    className={`gap-2 uppercase tracking-widest animate-pulse
+                                    ${isApollo
+                                            ? 'bg-green-900 border-green-700 text-green-100 hover:bg-green-800'
+                                            : isArchimedes
+                                                ? 'bg-[#5e4026] text-[#e6ccb2] border-[#8b5a2b] hover:bg-[#704d2e]'
+                                                : ''}
+                                `}
+                                >
+                                    <Trophy className="w-4 h-4" /> Collect Trophy
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Button
+                                variant={isUnlocked ? "primary" : "secondary"}
+                                onClick={nextAct}
+                                disabled={currentActIndex === story.acts.length - 1}
+                                className={`gap-2 uppercase tracking-widest 
+                                    ${isApollo
+                                        ? 'bg-green-900 border-green-700 text-green-100 hover:bg-green-800'
+                                        : isArchimedes
+                                            ? 'bg-[#5e4026] text-[#e6ccb2] border-[#8b5a2b] hover:bg-[#704d2e]'
+                                            : ''}
+                                `}
+                            >
+                                Next <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -555,5 +579,3 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
         <QuizGame minigame={minigame} onComplete={onComplete} />
     );
 }
-
-

@@ -7,15 +7,17 @@ interface Store extends UserState {
     spendCoins: (amount: number) => boolean;
     unlockAct: (actId: string) => void;
     completeMinigame: (minigameId: string) => void;
+    completeStory: (storyId: string) => void;
     isActUnlocked: (actId: string) => boolean;
 }
 
 export const useStore = create<Store>()(
     persist(
         (set, get) => ({
-            coins: 100, // Starter bonus? Or 0? User said "Starter Pack 100 coins $4.99". Maybe start with 0 or some freebies. Let's start with 0.
+            coins: 100, // Starter bonus
             unlockedActs: [],
             completedMinigames: [],
+            completedStories: [],
 
             addCoins: (amount) => set((state) => ({ coins: state.coins + amount })),
 
@@ -32,6 +34,12 @@ export const useStore = create<Store>()(
 
             completeMinigame: (minigameId) =>
                 set((state) => ({ completedMinigames: [...state.completedMinigames, minigameId] })),
+
+            completeStory: (storyId) =>
+                set((state) => {
+                    if (state.completedStories.includes(storyId)) return state;
+                    return { completedStories: [...state.completedStories, storyId] };
+                }),
 
             isActUnlocked: (actId) => get().unlockedActs.includes(actId),
         }),
