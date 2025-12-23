@@ -16,13 +16,42 @@ interface CipherGameProps {
 export function CipherGame({ question, instructions, winningCondition, encrypted, decrypted, theme = 'sci-fi', onComplete }: CipherGameProps) {
     const [input, setInput] = useState('');
     const [error, setError] = useState(false);
-    const [blink, setBlink] = useState(true);
+    const [options, setOptions] = useState<string[]>([]);
+    const [submitting, setSubmitting] = useState(false);
 
-    // Cursor Blink Effect
+    // Initial Setup for Options (Sci-Fi Theme)
     useEffect(() => {
-        const interval = setInterval(() => setBlink(b => !b), 500);
-        return () => clearInterval(interval);
-    }, []);
+        if (theme === 'sci-fi') {
+            const distractors = [
+                "SYSTEM PURGE", "MANUAL REBOOT", "CACHE CLEAR",
+                "BUFFER FLUSH", "SIGNAL LOCK", "VECTOR ALIGN",
+                "ABORT SEQUENCE", "POWER CYCLE"
+            ];
+            // Filter out if decrypted happens to be in distractors (unlikely but safe)
+            const cleanDistractors = distractors.filter(d => d !== decrypted);
+            // Pick 3 random distractors
+            const selected = cleanDistractors.sort(() => 0.5 - Math.random()).slice(0, 3);
+            selected.push(decrypted);
+            setOptions(selected.sort(() => 0.5 - Math.random()));
+        }
+    }, [theme, decrypted]);
+
+
+
+    const handleOptionClick = (option: string) => {
+        setInput(option);
+        // Auto-submit after a brief delay for effect
+        setSubmitting(true);
+        setTimeout(() => {
+            if (option === decrypted) {
+                onComplete(true);
+            } else {
+                setError(true);
+                setSubmitting(false);
+                setTimeout(() => setError(false), 1000);
+            }
+        }, 500);
+    };
 
     const handleSubmit = () => {
         if (input.toUpperCase().trim() === decrypted.toUpperCase()) {
@@ -121,6 +150,7 @@ export function CipherGame({ question, instructions, winningCondition, encrypted
                         <div className="text-green-400 text-sm mb-6">
                             <span className="opacity-50">&gt; ERROR CODE DETECTED:</span> <span className="text-red-500 font-bold animate-pulse">1202_ALARM</span><br />
                             <span className="opacity-50">&gt; INSTRUCTION:</span> {question}<br />
+                            <span className="opacity-50">&gt; MANUAL_OVERRIDE:</span> {instructions}<br />
                             <span className="opacity-50">&gt; GOAL:</span> {winningCondition}
                         </div>
 
@@ -131,35 +161,29 @@ export function CipherGame({ question, instructions, winningCondition, encrypted
                             </p>
                         </div>
 
-                        <div className="mt-8">
-                            <div className="text-green-600 text-xs mb-2">DECRYPTION_INPUT:</div>
-                            <div className="flex items-center gap-2 border-b-4 border-green-700 bg-green-900/20 p-4">
-                                <span className="text-green-500">&gt;</span>
-                                <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value.toUpperCase())}
-                                    className="bg-transparent border-none text-green-400 text-2xl tracking-[0.2em] w-full outline-none font-bold uppercase placeholder-green-900"
-                                    autoFocus
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                                />
-                                <div className={`w-3 h-6 bg-green-500 ${blink ? 'opacity-100' : 'opacity-0'}`}></div>
-                            </div>
+                        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {options.map((option, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleOptionClick(option)}
+                                    className={`
+                                        p-4 border-2 text-sm font-bold tracking-widest uppercase transition-all
+                                        ${input === option
+                                            ? 'bg-green-500 text-black border-green-500 shadow-[0_0_15px_rgba(74,222,128,0.8)]'
+                                            : 'bg-green-900/20 border-green-700 text-green-400 hover:bg-green-800/40 hover:border-green-500 hover:text-green-200'
+                                        }
+                                    `}
+                                >
+                                    <span className="mr-2 opacity-50">&gt;</span>
+                                    {option}
+                                </button>
+                            ))}
                         </div>
-
-                        {error && (
-                            <div className="mt-4 text-red-500 text-sm font-bold animate-pulse bg-red-900/20 p-2 border border-red-500/50">
-                                ! INVALID DECRYPTION KEY. BUFFER OVERFLOW IMMINENT.
-                            </div>
-                        )}
                     </div>
 
-                    <button
-                        onClick={handleSubmit}
-                        className="mt-8 w-full border-2 border-green-600 text-green-400 py-3 uppercase tracking-widest hover:bg-green-500 hover:text-black transition-colors font-bold text-sm"
-                    >
-                        Execute Command
-                    </button>
+                    <div className="mt-6 text-center text-xs text-green-800">
+                        SELECT_CORRECT_OVERRIDE_SEQUENCE
+                    </div>
                 </div>
             </div>
 

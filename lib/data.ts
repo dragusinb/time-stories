@@ -288,7 +288,13 @@ const s3 = 'story-3';
 // ACT 1-10: The Arrival & The Lever
 story3Acts.push(
     createAct(s3, 1, "Syracuse", "You step out of the portal into the blinding Mediterranean sun. The year is 212 BC. Syracuse. A city under siege. The smell of salt and anxiety hangs in the air.", undefined, "/images/archimedes/act-1.png"),
-    createAct(s3, 2, "The Old Man", "You find him drawing circles in the sand near the harbor. Archimedes. The greatest mind of antiquity. He doesn't even look up as you approach. 'Do not disturb my circles,' he mutters.", undefined, "/images/archimedes/act-2.png"),
+    createAct(s3, 2, "The Old Man", "You find him drawing circles in the sand near the harbor. Archimedes. The greatest mind of antiquity. He doesn't even look up as you approach. 'Do not disturb my circles,' he mutters.", {
+        id: 'mg-story-3-2',
+        type: 'circle',
+        question: "Calculate the exact value of Pi.",
+        instructions: "Measure the circumference and area of the sand circles.",
+        winningCondition: "Precision < 0.01"
+    }, "/images/archimedes/act-2.png"),
     createAct(s3, 3, "The Roman Fleet", "Ships approach the harbor. General Marcellus leads the Roman fleet. 'They are coming,' you say. Archimedes smiles, wiping the sand from his hands. 'Let them come. I have a surprise.'", undefined, "/images/archimedes/act-3.png"),
     createAct(s3, 4, "The Iron Hand", "He points to a massive crane on the wall. 'The Claw,' he whispers. 'It will lift their ships like toys. But it needs a precise operator.' He looks at you.", {
         id: 'mg-story-3-4',
@@ -372,11 +378,11 @@ story3Acts.push(
     createAct(s3, 29, "Thirst Quenched", "Fresh water flows into the trough. The people cheer. You drink. It tastes like life. You have beaten nature itself.", undefined, "/images/archimedes/act-29.png"),
     createAct(s3, 30, "The Scorpion", "To keep the Romans at bay, you improve the 'Scorpion' ballistas. You apply math to the tension. Precision targeting. You pick off centurions from 300 yards.", {
         id: 'mg-story-3-30',
-        type: 'tangram',
+        type: 'catapult',
         theme: 'ancient',
-        question: "Calibrate the Ballista sights.",
-        instructions: "Fit the geometric shapes to align the targeting mechanism.",
-        winningCondition: "Target Lock"
+        question: "Calibrate the Scorpion Ballista.",
+        instructions: "Adjust the Tension (Force) and Elevation (Angle) to hit the Roman target.",
+        winningCondition: "Direct Hit"
     }, "/images/archimedes/act-30.png"),
     createAct(s3, 31, "The Festival", "A year passes. The city grows complacent. Tonight is the festival of Artemis. Wine flows. Guards leave their posts. You feel a chill that has nothing to do with the wind.", undefined, "/images/archimedes/act-31.png"),
     createAct(s3, 32, "The Betrayal", "A disgruntled noble opens a side gate. No noise. Just a shadow moving in the dark. A Roman helmet glints. The end has begun.", undefined, "/images/archimedes/act-32.png"),

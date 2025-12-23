@@ -192,7 +192,7 @@ export function StoryReader({ story }: StoryReaderProps) {
                                         'bg-slate-900 border-slate-700 prose prose-invert'}
                             `}>
                                 {isArchimedes && (
-                                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] pointer-events-none"></div>
+                                    <div className="absolute inset-0 opacity-10 bg-[url('/images/aged-paper.png')] pointer-events-none"></div>
                                 )}
 
                                 {currentAct.backgroundImage && (
@@ -503,7 +503,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
     }
 
     if (minigame.type === 'lens') {
-        return <LensCraftingGame minigame={minigame} onComplete={onComplete} />;
+        return <LensCraftingGame minigame={minigame} onComplete={onComplete} theme={theme} />;
     }
 
     if (minigame.type === 'silo') {
