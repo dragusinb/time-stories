@@ -169,7 +169,7 @@ const LensCraftingGame: React.FC<LensCraftingGameProps> = ({ minigame, onComplet
                     ) : (
                         <div
                             className="absolute inset-0 bg-[url('/images/minigames/magnifier.png')] bg-cover bg-center opacity-80"
-                            style={{ filter: `blur(${displayBlur}px)`, sepia: '0.8' }}
+                            style={{ filter: `blur(${displayBlur}px) sepia(0.8)` }}
                         />
                     )}
 
