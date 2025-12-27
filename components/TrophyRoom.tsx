@@ -133,7 +133,7 @@ export default function TrophyRoom() {
                             <img
                                 src="/images/trophies/time-core.png"
                                 alt="Time Core"
-                                className={`w-64 h-64 object-contain transition-all duration-1000 ${powerLevel > 0 ? 'filter-none' : 'grayscale opacity-50'}`}
+                                className={`w-64 h-64 object-contain transition-all duration-1000 mix-blend-screen ${powerLevel > 0 ? 'filter-none' : 'grayscale opacity-50'}`}
                             />
 
                             {/* Inner Glow Pulse based on power level */}
@@ -231,7 +231,7 @@ function TrophyPedestal({ storyId, trophy, isUnlocked, onClick }: { storyId: str
                     <motion.img
                         src={trophy.image}
                         alt={trophy.name}
-                        className={`${trophy.className} drop-shadow-2xl z-20 relative`}
+                        className={`${trophy.className} drop-shadow-2xl z-20 relative mix-blend-screen`}
                         animate={isHovered ? trophy.animation : {}}
                     />
 
