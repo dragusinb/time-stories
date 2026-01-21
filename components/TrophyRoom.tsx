@@ -1,267 +1,415 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useStore } from '@/lib/store';
-import { Trophy, Info } from 'lucide-react';
+import { Trophy, Lock, Star, Clock, Gamepad2, CheckCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
-const TROPHIES = {
-    'story-1': {
-        id: 'story-1',
+interface TrophyData {
+    id: string;
+    storyId: string;
+    name: string;
+    storyTitle: string;
+    description: string;
+    era: string;
+    location: string;
+    totalActs: number;
+    icon: string;
+    color: string;
+    gradient: string;
+    borderColor: string;
+}
+
+const TROPHIES: TrophyData[] = [
+    {
+        id: 'trophy-1',
+        storyId: 'story-1',
         name: 'The Eagle Has Landed',
-        description: 'Awarded for completing the Apollo 11 Mission. A symbol of humanity\'s greatest leap.',
-        shortDesc: 'Apollo 11 Mission Complete',
-        image: '/images/trophies/trophy-rocket.png',
-        className: 'w-24 h-auto',
-        animation: {
-            y: [0, -20, -20, 0],
-            rotate: [0, -5, 5, 0],
-            transition: { duration: 2, times: [0, 0.2, 0.8, 1] }
-        }
+        storyTitle: 'Apollo 11',
+        description: 'You guided humanity to the Moon and back. One small step for man, one giant leap for mankind.',
+        era: '1969',
+        location: 'The Moon',
+        totalActs: 40,
+        icon: '🚀',
+        color: 'text-emerald-400',
+        gradient: 'from-emerald-900/50 to-emerald-950/80',
+        borderColor: 'border-emerald-500/30'
     },
-    'story-2': {
-        id: 'story-2',
-        name: 'The Alchemist\'s Mask',
-        description: 'Awarded for surviving the Black Plague. Used by the first "Beak Doctors" of Florence.',
-        shortDesc: 'Alchemist\'s Apprentice Complete',
-        image: '/images/trophies/trophy-mask.png',
-        className: 'w-24 h-auto',
-        animation: {
-            scale: [1, 1.1, 1],
-            filter: ["hue-rotate(0deg)", "hue-rotate(90deg)", "hue-rotate(0deg)"],
-            transition: { duration: 2 }
-        }
+    {
+        id: 'trophy-2',
+        storyId: 'story-2',
+        name: "The Alchemist's Legacy",
+        storyTitle: 'The Alchemist',
+        description: 'You survived the Black Death and discovered the secrets of germ theory centuries before its time.',
+        era: '1348',
+        location: 'Florence',
+        totalActs: 40,
+        icon: '⚗️',
+        color: 'text-amber-400',
+        gradient: 'from-amber-900/50 to-amber-950/80',
+        borderColor: 'border-amber-500/30'
     },
-    'story-3': {
-        id: 'story-3',
+    {
+        id: 'trophy-3',
+        storyId: 'story-3',
         name: 'The Circles of Truth',
-        description: 'Awarded for defending Syracuse with Archimedes. "Noli turbare circulos meos."',
-        shortDesc: 'Archimedes\' Sidekick Complete',
-        image: '/images/trophies/trophy-circles.png',
-        className: 'w-28 h-auto',
-        animation: {
-            rotate: [0, 360],
-            transition: { duration: 3, ease: "linear" }
-        }
+        storyTitle: 'Archimedes',
+        description: 'You defended Syracuse alongside the greatest mind of antiquity. "Noli turbare circulos meos."',
+        era: '212 BC',
+        location: 'Syracuse',
+        totalActs: 50,
+        icon: '📐',
+        color: 'text-blue-400',
+        gradient: 'from-blue-900/50 to-blue-950/80',
+        borderColor: 'border-blue-500/30'
     }
-};
+];
 
 export default function TrophyRoom() {
     const completedStories = useStore((state) => state.completedStories);
-    const [selectedTrophy, setSelectedTrophy] = useState<string | null>(null);
+    const completedMinigames = useStore((state) => state.completedMinigames);
+    const unlockedActs = useStore((state) => state.unlockedActs);
 
-    // Calculate core power level (0-3)
-    const powerLevel = completedStories.length;
-    const maxPower = Object.keys(TROPHIES).length;
+    const [selectedTrophy, setSelectedTrophy] = useState<TrophyData | null>(null);
+
+    const totalTrophies = TROPHIES.length;
+    const earnedTrophies = completedStories.length;
+    const completionPercent = Math.round((earnedTrophies / totalTrophies) * 100);
+
+    // Calculate stats for a story
+    const getStoryStats = (storyId: string, totalActs: number) => {
+        const storyMinigames = completedMinigames.filter(m => m.startsWith(storyId));
+        const storyUnlocked = unlockedActs.filter(a => a.startsWith(storyId));
+        return {
+            minigamesCompleted: storyMinigames.length,
+            actsUnlocked: storyUnlocked.length + 5, // +5 for free acts
+            progress: Math.min(100, Math.round(((storyUnlocked.length + 5) / totalActs) * 100))
+        };
+    };
 
     return (
-        <div className="relative w-full h-full bg-[#0a0503] rounded-lg overflow-hidden flex flex-col items-center justify-center border-4 border-[#3e2723] shadow-[inset_0_0_100px_rgba(0,0,0,0.9)]">
+        <div className="relative w-full min-h-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8 overflow-auto">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{
+                    backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                    backgroundSize: '32px 32px'
+                }}></div>
+            </div>
 
-            {/* Ambient Particles/Fog (CSS Overlay) */}
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+            {/* Header */}
+            <div className="relative z-10 text-center mb-8 md:mb-12">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="inline-flex items-center gap-3 mb-4"
+                >
+                    <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+                        <Trophy className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <h1 className="text-2xl md:text-4xl font-serif font-bold text-white">
+                        Trophy <span className="text-amber-500">Room</span>
+                    </h1>
+                </motion.div>
 
-            {/* Background Image (Dark Vault) */}
-            <div
-                className="absolute inset-0 bg-cover bg-center opacity-30 z-0 mix-blend-overlay"
-                style={{ backgroundImage: "url('/images/trophies/room_bg.png')" }}
-            ></div>
+                <p className="text-slate-400 text-sm md:text-base max-w-md mx-auto mb-6">
+                    Complete stories to earn trophies and prove your mastery of time travel.
+                </p>
 
-            {/* Content Container */}
-            <div className="relative z-10 w-full h-full p-8 flex flex-col items-center justify-between">
-
-                {/* Header / Vault Status */}
-                <div className="w-full flex justify-between items-start">
-                    <div className="bg-[#1a110d]/80 border border-[#8b5a2b] px-6 py-3 rounded backdrop-blur-md">
-                        <h2 className="text-xl font-serif text-[#e6ccb2] tracking-widest uppercase flex items-center gap-2">
-                            <span className="text-amber-500">❖</span> The Time Vault
-                        </h2>
-                        <div className="flex items-center gap-2 mt-1">
-                            <div className="text-[#8b5a2b] text-xs font-mono uppercase">Timeline Stability:</div>
-                            <div className="w-24 h-2 bg-black rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${(powerLevel / maxPower) * 100}%` }}
-                                    className="h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"
-                                ></motion.div>
-                            </div>
-                            <div className="text-blue-400 text-xs font-mono">{Math.round((powerLevel / maxPower) * 100)}%</div>
+                {/* Overall Progress */}
+                <div className="inline-flex flex-col items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4">
+                    <div className="flex items-center gap-4">
+                        <div className="text-center">
+                            <div className="text-3xl font-bold text-white">{earnedTrophies}</div>
+                            <div className="text-xs text-slate-500 uppercase tracking-wider">Earned</div>
+                        </div>
+                        <div className="w-px h-10 bg-slate-700"></div>
+                        <div className="text-center">
+                            <div className="text-3xl font-bold text-slate-500">{totalTrophies}</div>
+                            <div className="text-xs text-slate-500 uppercase tracking-wider">Total</div>
                         </div>
                     </div>
-                </div>
-
-                {/* Central Time Core */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 flex flex-col items-center justify-center pointer-events-none group">
-                    {/* Cables connecting to trophies (Visual only) */}
-                    <svg className="absolute w-[800px] h-[400px] opacity-30" style={{ strokeDasharray: 10 }}>
-                        {/* Left Line */}
-                        <motion.path
-                            d="M 400 200 L 150 350"
-                            stroke={completedStories.includes('story-1') ? "#3b82f6" : "#333"}
-                            strokeWidth="4"
-                            fill="none"
-                            animate={completedStories.includes('story-1') ? { strokeDashoffset: [0, -20] } : {}}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                        {/* Right Line */}
-                        <motion.path
-                            d="M 400 200 L 650 350"
-                            stroke={completedStories.includes('story-3') ? "#3b82f6" : "#333"}
-                            strokeWidth="4"
-                            fill="none"
-                            animate={completedStories.includes('story-3') ? { strokeDashoffset: [0, -20] } : {}}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                        {/* Center Line */}
-                        <motion.path
-                            d="M 400 200 L 400 350"
-                            stroke={completedStories.includes('story-2') ? "#3b82f6" : "#333"}
-                            strokeWidth="4"
-                            fill="none"
-                            animate={completedStories.includes('story-2') ? { strokeDashoffset: [0, -20] } : {}}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                    </svg>
-
-                    <div className="relative">
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.02, 1],
-                                opacity: [0.8, 1, 0.8]
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            className="relative z-10"
-                        >
-                            {/* Core Image */}
-                            <img
-                                src="/images/trophies/time-core.png"
-                                alt="Time Core"
-                                className={`w-64 h-64 object-contain transition-all duration-1000 mix-blend-screen ${powerLevel > 0 ? 'filter-none' : 'grayscale opacity-50'}`}
+                    <div className="w-full mt-2">
+                        <div className="h-2 bg-slate-900 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${completionPercent}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-amber-500 to-amber-400"
                             />
-
-                            {/* Inner Glow Pulse based on power level */}
-                            {powerLevel > 0 && (
-                                <div
-                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-blue-500 rounded-full blur-[50px] mix-blend-screen"
-                                    style={{ opacity: powerLevel * 0.3 }}
-                                ></div>
-                            )}
-                        </motion.div>
+                        </div>
+                        <div className="text-xs text-amber-500 mt-1 font-mono">{completionPercent}% Complete</div>
                     </div>
                 </div>
-
-                {/* Trophies Display Grid (Bottom) */}
-                <div className="grid grid-cols-3 gap-20 items-end w-full px-12 pb-12 relative z-20">
-                    {/* Story 1 (Left) */}
-                    <TrophyPedestal
-                        storyId="story-1"
-                        trophy={TROPHIES['story-1']}
-                        isUnlocked={completedStories.includes('story-1')}
-                        onClick={() => setSelectedTrophy('story-1')}
-                    />
-
-                    {/* Story 2 (Center) */}
-                    <TrophyPedestal
-                        storyId="story-2"
-                        trophy={TROPHIES['story-2']}
-                        isUnlocked={completedStories.includes('story-2')}
-                        onClick={() => setSelectedTrophy('story-2')}
-                    />
-
-                    {/* Story 3 (Right) */}
-                    <TrophyPedestal
-                        storyId="story-3"
-                        trophy={TROPHIES['story-3']}
-                        isUnlocked={completedStories.includes('story-3')}
-                        onClick={() => setSelectedTrophy('story-3')}
-                    />
-                </div>
-
-                {/* Selected Trophy Modal / Overlay */}
-                <AnimatePresence>
-                    {selectedTrophy && TROPHIES[selectedTrophy as keyof typeof TROPHIES] && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 20 }}
-                            className="absolute bottom-32 bg-black/90 border border-amber-500/50 p-6 rounded-lg shadow-2xl max-w-md z-50 backdrop-blur-xl"
-                        >
-                            <div className="flex items-start gap-4">
-                                <div className="p-3 bg-amber-900/20 rounded-full border border-amber-700/50">
-                                    <img
-                                        src={TROPHIES[selectedTrophy as keyof typeof TROPHIES].image}
-                                        className="w-16 h-16 object-contain"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-amber-500 mb-1">{TROPHIES[selectedTrophy as keyof typeof TROPHIES].name}</h3>
-                                    <p className="text-slate-300 text-sm leading-relaxed">{TROPHIES[selectedTrophy as keyof typeof TROPHIES].description}</p>
-                                    <div className="mt-3 flex gap-2">
-                                        <button
-                                            onClick={() => setSelectedTrophy(null)}
-                                            className="px-3 py-1 text-xs uppercase tracking-widest border border-slate-600 text-slate-400 hover:text-white hover:border-slate-400 rounded transition-colors"
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
             </div>
+
+            {/* Trophy Grid */}
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
+                {TROPHIES.map((trophy, index) => {
+                    const isUnlocked = completedStories.includes(trophy.storyId);
+                    const stats = getStoryStats(trophy.storyId, trophy.totalActs);
+
+                    return (
+                        <motion.div
+                            key={trophy.id}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.15 }}
+                        >
+                            <TrophyCard
+                                trophy={trophy}
+                                isUnlocked={isUnlocked}
+                                stats={stats}
+                                onClick={() => setSelectedTrophy(trophy)}
+                            />
+                        </motion.div>
+                    );
+                })}
+            </div>
+
+            {/* Empty State Message */}
+            {earnedTrophies === 0 && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-center mt-8 p-6 border border-dashed border-slate-700 rounded-xl max-w-md mx-auto"
+                >
+                    <Sparkles className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-500 text-sm">
+                        No trophies yet. Complete a story to earn your first trophy!
+                    </p>
+                    <Link
+                        href="/"
+                        className="inline-block mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                        Start a Story
+                    </Link>
+                </motion.div>
+            )}
+
+            {/* Trophy Detail Modal */}
+            <AnimatePresence>
+                {selectedTrophy && (
+                    <TrophyModal
+                        trophy={selectedTrophy}
+                        isUnlocked={completedStories.includes(selectedTrophy.storyId)}
+                        stats={getStoryStats(selectedTrophy.storyId, selectedTrophy.totalActs)}
+                        onClose={() => setSelectedTrophy(null)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
-function TrophyPedestal({ storyId, trophy, isUnlocked, onClick }: { storyId: string, trophy: any, isUnlocked: boolean, onClick: () => void }) {
-    const [isHovered, setIsHovered] = useState(false);
+interface TrophyCardProps {
+    trophy: TrophyData;
+    isUnlocked: boolean;
+    stats: { minigamesCompleted: number; actsUnlocked: number; progress: number };
+    onClick: () => void;
+}
 
+function TrophyCard({ trophy, isUnlocked, stats, onClick }: TrophyCardProps) {
     return (
-        <div
-            className="flex flex-col items-center group relative cursor-pointer h-64 justify-end"
-            onClick={isUnlocked ? onClick : undefined}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+        <motion.button
+            onClick={onClick}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`
+                w-full text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden
+                ${isUnlocked
+                    ? `bg-gradient-to-br ${trophy.gradient} ${trophy.borderColor} hover:border-opacity-60`
+                    : 'bg-slate-900/50 border-slate-800 hover:border-slate-700'
+                }
+            `}
         >
-            {isUnlocked ? (
-                <>
-                    {/* Hover Glow */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-amber-500/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                    {/* Trophy Image with Interaction */}
-                    <motion.img
-                        src={trophy.image}
-                        alt={trophy.name}
-                        className={`${trophy.className} drop-shadow-2xl z-20 relative mix-blend-screen`}
-                        animate={isHovered ? trophy.animation : {}}
-                    />
-
-                    {/* Connection Node */}
-                    <div className="w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] mt-4 z-20 border-2 border-black"></div>
-                </>
-            ) : (
-                /* Locked Placeholder */
-                <div className="opacity-30 filter grayscale flex flex-col items-center justify-end h-full">
-                    <Trophy className="w-16 h-16 text-slate-500 mb-4" />
-                    <div className="w-16 h-2 bg-black/30 rounded-full blur-sm"></div>
-                    {/* Connection Node (Off) */}
-                    <div className="w-4 h-4 rounded-full bg-slate-800 border-2 border-black mt-4"></div>
-                </div>
+            {/* Unlock Shimmer Effect */}
+            {isUnlocked && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer"></div>
             )}
 
-            {/* Pedestal Base */}
-            <div className={`
-                w-32 h-16 mt-[-8px] relative z-10
-                bg-gradient-to-b from-[#2c1e16] to-[#1a110d]
-                border-x-2 border-t border-[#3e2723]
-                flex items-center justify-center
-                group-hover:shadow-[0_0_20px_rgba(251,191,36,0.1)] transition-shadow duration-300
-                ${isUnlocked ? 'opacity-100' : 'opacity-50'}
-            `}>
-                <div className="text-[10px] text-[#8b5a2b] font-mono tracking-widest uppercase opacity-70 mt-4">
-                    {isUnlocked ? 'SECURE' : 'LOCKED'}
-                </div>
-            </div>
+            <div className="relative z-10">
+                {/* Trophy Icon & Status */}
+                <div className="flex items-start justify-between mb-4">
+                    <div className={`
+                        w-16 h-16 rounded-xl flex items-center justify-center text-3xl
+                        ${isUnlocked
+                            ? 'bg-black/30'
+                            : 'bg-slate-800 grayscale opacity-50'
+                        }
+                    `}>
+                        {isUnlocked ? trophy.icon : <Lock className="w-6 h-6 text-slate-600" />}
+                    </div>
 
-        </div>
+                    {isUnlocked && (
+                        <div className="flex items-center gap-1 bg-green-500/20 border border-green-500/30 px-2 py-1 rounded-full">
+                            <CheckCircle className="w-3 h-3 text-green-400" />
+                            <span className="text-xs text-green-400 font-medium">Earned</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Trophy Info */}
+                <h3 className={`font-bold text-lg mb-1 ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                    {trophy.name}
+                </h3>
+                <p className={`text-sm mb-3 ${isUnlocked ? trophy.color : 'text-slate-600'}`}>
+                    {trophy.storyTitle}
+                </p>
+
+                {/* Era & Location */}
+                <div className="flex items-center gap-3 text-xs mb-4">
+                    <span className={`flex items-center gap-1 ${isUnlocked ? 'text-slate-300' : 'text-slate-600'}`}>
+                        <Clock className="w-3 h-3" />
+                        {trophy.era}
+                    </span>
+                    <span className={`${isUnlocked ? 'text-slate-400' : 'text-slate-700'}`}>•</span>
+                    <span className={isUnlocked ? 'text-slate-300' : 'text-slate-600'}>
+                        {trophy.location}
+                    </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                        <span className={isUnlocked ? 'text-slate-400' : 'text-slate-600'}>Progress</span>
+                        <span className={isUnlocked ? trophy.color : 'text-slate-600'}>{stats.progress}%</span>
+                    </div>
+                    <div className="h-1.5 bg-black/30 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${stats.progress}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className={`h-full rounded-full ${isUnlocked ? 'bg-gradient-to-r from-white/60 to-white/80' : 'bg-slate-700'}`}
+                        />
+                    </div>
+                </div>
+
+                {/* Stats Row */}
+                {isUnlocked && (
+                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
+                        <div className="flex items-center gap-1.5">
+                            <Gamepad2 className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="text-xs text-slate-300">{stats.minigamesCompleted} minigames</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <Star className="w-3.5 h-3.5 text-amber-400" />
+                            <span className="text-xs text-slate-300">{trophy.totalActs} acts</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </motion.button>
+    );
+}
+
+interface TrophyModalProps {
+    trophy: TrophyData;
+    isUnlocked: boolean;
+    stats: { minigamesCompleted: number; actsUnlocked: number; progress: number };
+    onClose: () => void;
+}
+
+function TrophyModal({ trophy, isUnlocked, stats, onClose }: TrophyModalProps) {
+    return (
+        <>
+            {/* Backdrop */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            />
+
+            {/* Modal */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-lg md:w-full z-50"
+            >
+                <div className={`
+                    h-full md:h-auto rounded-2xl border overflow-hidden
+                    ${isUnlocked
+                        ? `bg-gradient-to-br ${trophy.gradient} ${trophy.borderColor}`
+                        : 'bg-slate-900 border-slate-700'
+                    }
+                `}>
+                    {/* Header */}
+                    <div className="p-6 text-center border-b border-white/10">
+                        <div className={`
+                            w-24 h-24 mx-auto rounded-2xl flex items-center justify-center text-5xl mb-4
+                            ${isUnlocked ? 'bg-black/30' : 'bg-slate-800'}
+                        `}>
+                            {isUnlocked ? trophy.icon : <Lock className="w-10 h-10 text-slate-600" />}
+                        </div>
+
+                        <h2 className={`text-2xl font-bold mb-1 ${isUnlocked ? 'text-white' : 'text-slate-400'}`}>
+                            {trophy.name}
+                        </h2>
+                        <p className={`text-sm ${isUnlocked ? trophy.color : 'text-slate-600'}`}>
+                            {trophy.storyTitle} • {trophy.era}
+                        </p>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                        <p className={`text-sm leading-relaxed mb-6 ${isUnlocked ? 'text-slate-200' : 'text-slate-500'}`}>
+                            {isUnlocked
+                                ? trophy.description
+                                : `Complete "${trophy.storyTitle}" to unlock this trophy and learn its secrets.`
+                            }
+                        </p>
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            <div className={`text-center p-3 rounded-xl ${isUnlocked ? 'bg-black/20' : 'bg-slate-800/50'}`}>
+                                <div className={`text-xl font-bold ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                                    {stats.progress}%
+                                </div>
+                                <div className="text-xs text-slate-500">Progress</div>
+                            </div>
+                            <div className={`text-center p-3 rounded-xl ${isUnlocked ? 'bg-black/20' : 'bg-slate-800/50'}`}>
+                                <div className={`text-xl font-bold ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                                    {trophy.totalActs}
+                                </div>
+                                <div className="text-xs text-slate-500">Acts</div>
+                            </div>
+                            <div className={`text-center p-3 rounded-xl ${isUnlocked ? 'bg-black/20' : 'bg-slate-800/50'}`}>
+                                <div className={`text-xl font-bold ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                                    {stats.minigamesCompleted}
+                                </div>
+                                <div className="text-xs text-slate-500">Minigames</div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                            >
+                                Close
+                            </button>
+                            <Link
+                                href={`/story/${trophy.storyId}/read`}
+                                className={`
+                                    flex-1 px-4 py-3 text-center text-sm font-medium rounded-xl transition-colors
+                                    ${isUnlocked
+                                        ? 'bg-white/20 hover:bg-white/30 text-white'
+                                        : 'bg-amber-600 hover:bg-amber-500 text-white'
+                                    }
+                                `}
+                            >
+                                {isUnlocked ? 'Replay Story' : 'Start Story'}
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        </>
     );
 }

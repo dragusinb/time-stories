@@ -100,3 +100,17 @@ h6 {
 .pixel-btn-primary {
   @apply border-4 border-amber-700 bg-amber-600 hover:bg-amber-500 text-white shadow-[4px_4px_0px_0px_#00000080];
 }
+
+/* Shimmer animation for trophy cards */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s infinite;
+}

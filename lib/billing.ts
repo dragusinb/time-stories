@@ -12,8 +12,8 @@ interface BillingState {
     restorePurchases: () => Promise<void>;
 }
 
-// TODO: Replace with your actual RevenueCat API Key for Android/iOS
-const REVENUECAT_API_KEY = 'goog_abcdefghijklmnopqrstuvwxyz';
+// RevenueCat API Key
+const REVENUECAT_API_KEY = 'test_CeKmffdpccGlXCpmaoPJzLaGfPg';
 const PRO_ENTITLEMENT_ID = 'pro'; // Change this to match your RevenueCat Entitlement ID
 
 export const useBillingStore = create<BillingState>((set, get) => ({

@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Minigame } from '@/types';
-import { Sparkles, Crosshair } from 'lucide-react';
+import { Star, RotateCcw, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ConstellationGameProps {
     minigame: Minigame;
@@ -9,153 +12,268 @@ interface ConstellationGameProps {
     theme?: 'medieval' | 'apollo' | 'ancient';
 }
 
-const ConstellationGame: React.FC<ConstellationGameProps> = ({ minigame, onComplete, theme = 'medieval' }) => {
-    const [connected, setConnected] = useState<number[]>([]);
-    const [message, setMessage] = useState(theme === 'apollo' ? "ALIGNING DOCKING VECTORS..." : "LINK NAVIGATION STARS");
-    const [shaking, setShaking] = useState(false);
+interface StarPoint {
+    id: number;
+    x: number;
+    y: number;
+    name: string;
+    isTarget: boolean;
+}
 
-    const isApollo = theme === 'apollo';
+/**
+ * ConstellationGame - A kid-friendly star navigation game
+ *
+ * Educational concept: Apollo astronauts used stars to navigate in space.
+ * They would align their spacecraft with specific bright stars.
+ *
+ * Gameplay: Tap all the highlighted (target) stars to complete navigation.
+ * Order doesn't matter - just find and tap all the bright stars!
+ */
+const ConstellationGame: React.FC<ConstellationGameProps> = ({ minigame, onComplete, theme = 'apollo' }) => {
+    // Star field - some are targets (navigation stars), others are background
+    const [stars] = useState<StarPoint[]>([
+        // Target stars (the ones to find)
+        { id: 1, x: 25, y: 20, name: 'Polaris', isTarget: true },
+        { id: 2, x: 50, y: 35, name: 'Vega', isTarget: true },
+        { id: 3, x: 75, y: 25, name: 'Arcturus', isTarget: true },
+        { id: 4, x: 40, y: 60, name: 'Sirius', isTarget: true },
+        { id: 5, x: 65, y: 70, name: 'Canopus', isTarget: true },
+        // Background stars (distractors)
+        { id: 6, x: 15, y: 45, name: '', isTarget: false },
+        { id: 7, x: 85, y: 50, name: '', isTarget: false },
+        { id: 8, x: 30, y: 80, name: '', isTarget: false },
+        { id: 9, x: 55, y: 15, name: '', isTarget: false },
+        { id: 10, x: 80, y: 85, name: '', isTarget: false },
+        { id: 11, x: 10, y: 70, name: '', isTarget: false },
+        { id: 12, x: 90, y: 30, name: '', isTarget: false },
+    ]);
 
-    // Stars positions (percentage)
-    const stars = [
-        { id: 0, x: 20, y: 80, name: isApollo ? "PORT_A" : "ALPHA" },
-        { id: 1, x: 40, y: 60, name: isApollo ? "VECTOR_1" : "BETA" },
-        { id: 2, x: 50, y: 30, name: isApollo ? "GUIDANCE" : "GAMMA" },
-        { id: 3, x: 70, y: 40, name: isApollo ? "VECTOR_2" : "DELTA" },
-        { id: 4, x: 80, y: 70, name: isApollo ? "PORT_B" : "EPSILON" }
-    ];
+    const [selectedStars, setSelectedStars] = useState<number[]>([]);
+    const [isComplete, setIsComplete] = useState(false);
+    const [wrongClick, setWrongClick] = useState(false);
 
-    // Correct path: 0 -> 1 -> 2 -> 3 -> 4
-    const handleStarClick = (id: number) => {
-        if (connected.includes(id)) return;
+    const targetStars = stars.filter(s => s.isTarget);
+    const targetsFound = selectedStars.filter(id => stars.find(s => s.id === id)?.isTarget).length;
+    const totalTargets = targetStars.length;
+    const progress = Math.round((targetsFound / totalTargets) * 100);
 
-        // Must connect in order
-        if (id === connected.length) {
-            const newConnected = [...connected, id];
-            setConnected(newConnected);
+    const handleStarClick = (star: StarPoint) => {
+        if (isComplete) return;
 
-            if (newConnected.length === stars.length) {
-                setMessage(isApollo ? "HARD DOCK CONFIRMED." : "TRAJECTORY LOCKED. GUIDANCE ACTIVE.");
-                setTimeout(() => onComplete(100), 1500);
+        if (star.isTarget) {
+            // Correct - it's a navigation star
+            if (!selectedStars.includes(star.id)) {
+                const newSelected = [...selectedStars, star.id];
+                setSelectedStars(newSelected);
+
+                // Check if all targets found
+                const foundTargets = newSelected.filter(id => stars.find(s => s.id === id)?.isTarget).length;
+                if (foundTargets === totalTargets) {
+                    setIsComplete(true);
+                    setTimeout(() => onComplete(100), 1500);
+                }
             }
         } else {
-            setShaking(true);
-            setMessage(isApollo ? "ALIGNMENT ERROR. RESET." : "INVALID CONNECTION. RETRY.");
-            setTimeout(() => {
-                setShaking(false);
-                setMessage(isApollo ? "ALIGNING DOCKING VECTORS..." : "LINK NAVIGATION STARS");
-            }, 600);
+            // Wrong star - give feedback but don't penalize harshly
+            setWrongClick(true);
+            setTimeout(() => setWrongClick(false), 500);
         }
     };
 
+    const handleReset = () => {
+        setSelectedStars([]);
+        setIsComplete(false);
+    };
+
+    const isApollo = theme === 'apollo';
+
     return (
-        <div className={`flex flex-col items-center space-y-6 p-4 md:p-8 border-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] font-pixel 
-            ${isApollo ? 'bg-black border-green-900' : 'bg-slate-950 border-slate-800'}`}>
-            <div className="text-center w-full">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    {isApollo ? <Crosshair className="w-5 h-5 text-green-500 animate-spin-slow" /> : <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />}
-                    <h3 className={`text-xl tracking-[0.25em] uppercase glow-text ${isApollo ? 'text-green-500 font-mono' : 'text-amber-500'}`}>{minigame.question}</h3>
-                </div>
-                <div className={`h-px w-full mb-4 ${isApollo ? 'bg-green-900' : 'bg-gradient-to-r from-transparent via-amber-900/50 to-transparent'}`}></div>
-                <p className={`text-xs uppercase tracking-widest font-mono ${isApollo ? 'text-green-700' : 'text-slate-500'}`}>{minigame.instructions}</p>
+        <div className={`
+            flex flex-col items-center gap-4 p-4 md:p-6 rounded-xl border-2
+            ${isApollo
+                ? 'bg-slate-950 border-green-900/50'
+                : 'bg-slate-900 border-slate-700'
+            }
+        `}>
+            {/* Header */}
+            <div className="text-center">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-1">{minigame.question}</h3>
+                <p className={`text-xs md:text-sm ${isApollo ? 'text-green-600' : 'text-slate-400'}`}>
+                    Tap the bright navigation stars to align your spacecraft
+                </p>
             </div>
 
-            {/* Viewport */}
-            <div className={`relative w-64 h-64 md:w-80 md:h-80 overflow-hidden border-[6px] shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] transition-transform duration-100 
-                ${shaking ? 'translate-x-1' : ''}
-                ${isApollo ? 'rounded-none border-green-800 bg-black' : 'rounded-full border-slate-700 bg-[radial-gradient(circle_at_center,#1e293b_0%,#020617_100%)]'}`}>
-
-                {/* Space Background */}
-                {!isApollo && (
-                    <div className="absolute inset-0">
-                        {/* Distant Stars */}
-                        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-                        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(#fbbf24 1px, transparent 1px)', backgroundSize: '50px 50px', backgroundPosition: '25px 25px' }}></div>
+            {/* Progress */}
+            <div className="flex items-center gap-4 w-full max-w-xs">
+                <div className="flex-1">
+                    <div className="flex justify-between text-xs mb-1">
+                        <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Stars Found</span>
+                        <span className={isApollo ? 'text-green-400' : 'text-white'}>{targetsFound}/{totalTargets}</span>
                     </div>
-                )}
+                    <div className={`h-2 rounded-full overflow-hidden ${isApollo ? 'bg-black' : 'bg-slate-800'}`}>
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            className={`h-full ${isApollo ? 'bg-green-500' : 'bg-amber-500'}`}
+                        />
+                    </div>
+                </div>
+                <button
+                    onClick={handleReset}
+                    className={`p-2 rounded-lg ${isApollo ? 'bg-green-900/30 text-green-500 hover:bg-green-900/50' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                >
+                    <RotateCcw className="w-4 h-4" />
+                </button>
+            </div>
 
-                {/* Apollo Grid */}
-                {isApollo && (
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,50,0,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(0,50,0,0.2)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-                )}
+            {/* Star Field */}
+            <div
+                className={`
+                    relative w-full aspect-square max-w-sm rounded-xl overflow-hidden
+                    ${isApollo ? 'bg-black' : 'bg-slate-900'}
+                    ${wrongClick ? 'animate-pulse ring-2 ring-red-500' : ''}
+                `}
+            >
+                {/* Background stars (tiny dots) */}
+                {Array.from({ length: 50 }).map((_, i) => (
+                    <div
+                        key={`bg-${i}`}
+                        className="absolute w-0.5 h-0.5 bg-white/30 rounded-full"
+                        style={{
+                            left: `${(i * 17 + 7) % 100}%`,
+                            top: `${(i * 23 + 11) % 100}%`,
+                        }}
+                    />
+                ))}
 
-                {/* Connection Lines */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
-                    <defs>
-                        <filter id="glow">
-                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                            <feMerge>
-                                <feMergeNode in="coloredBlur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    {connected.map((starId, idx) => {
-                        if (idx === 0) return null;
-                        const prevStar = stars[connected[idx - 1]];
-                        const currStar = stars[starId];
+                {/* Connection lines between found stars */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                    {selectedStars.map((starId, index) => {
+                        if (index === 0) return null;
+                        const prevStar = stars.find(s => s.id === selectedStars[index - 1]);
+                        const currStar = stars.find(s => s.id === starId);
+                        if (!prevStar || !currStar || !prevStar.isTarget || !currStar.isTarget) return null;
+
                         return (
-                            <line
-                                key={idx}
+                            <motion.line
+                                key={`line-${index}`}
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ pathLength: 1, opacity: 1 }}
                                 x1={`${prevStar.x}%`}
                                 y1={`${prevStar.y}%`}
                                 x2={`${currStar.x}%`}
                                 y2={`${currStar.y}%`}
-                                stroke={isApollo ? "#22c55e" : "#fbbf24"}
-                                strokeWidth={isApollo ? "1" : "2"}
-                                filter="url(#glow)"
-                                className="animate-in fade-in duration-500"
+                                stroke={isApollo ? '#22c55e' : '#f59e0b'}
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                opacity={0.6}
                             />
                         );
                     })}
-                    {/* Projected Next Line (dashed) */}
-                    {connected.length > 0 && connected.length < stars.length && (
-                        <line
-                            x1={`${stars[connected[connected.length - 1]].x}%`}
-                            y1={`${stars[connected[connected.length - 1]].y}%`}
-                            x2={`${stars[connected.length].x}%`}
-                            y2={`${stars[connected.length].y}%`}
-                            stroke={isApollo ? "rgba(34, 197, 94, 0.3)" : "rgba(251, 191, 36, 0.2)"}
-                            strokeWidth="1"
-                            strokeDasharray="4 4"
-                        />
-                    )}
                 </svg>
 
-                {/* Stars/Targets */}
-                {stars.map((star) => (
-                    <div key={star.id} className="absolute z-20" style={{ left: `${star.x}%`, top: `${star.y}%`, transform: 'translate(-50%, -50%)' }}>
-                        <button
-                            onClick={() => handleStarClick(star.id)}
-                            className={`group relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
-                                ${connected.includes(star.id) ? 'scale-110' : 'hover:scale-125 hover:bg-white/10'}
-                            `}
-                        >
-                            {/* Icon */}
-                            {isApollo ? (
-                                <div className={`w-4 h-4 border transition-colors duration-300 ${connected.includes(star.id) ? 'bg-green-500 border-green-400' : 'border-green-700 bg-black'}`}></div>
-                            ) : (
-                                <div className={`w-3 h-3 rotate-45 transition-colors duration-300 ${connected.includes(star.id) ? 'bg-amber-400 shadow-[0_0_15px_#fbbf24]' : 'bg-slate-500 group-hover:bg-slate-300'}`}></div>
-                            )}
+                {/* Interactive stars */}
+                {stars.map((star) => {
+                    const isSelected = selectedStars.includes(star.id);
+                    const isTargetStar = star.isTarget;
 
-                            {/* Target Reticle (Only on next target) */}
-                            {connected.length === star.id && (
-                                <div className={`absolute inset-0 border max-w-[200%] max-h-[200%] rounded-full animate-ping opacity-75 ${isApollo ? 'border-green-500' : 'border-green-400'}`}></div>
+                    return (
+                        <motion.button
+                            key={star.id}
+                            onClick={() => handleStarClick(star)}
+                            disabled={isComplete}
+                            className={`
+                                absolute transform -translate-x-1/2 -translate-y-1/2
+                                rounded-full flex items-center justify-center
+                                transition-all
+                                ${isTargetStar
+                                    ? isSelected
+                                        ? 'w-8 h-8 md:w-10 md:h-10 bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)]'
+                                        : 'w-6 h-6 md:w-8 md:h-8 bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.6)] hover:scale-125'
+                                    : 'w-2 h-2 md:w-3 md:h-3 bg-white/40 hover:bg-white/60'
+                                }
+                            `}
+                            style={{ left: `${star.x}%`, top: `${star.y}%` }}
+                            whileHover={!isSelected ? { scale: 1.3 } : {}}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            {isTargetStar && isSelected && (
+                                <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
                             )}
-                        </button>
-                        {/* Label */}
-                        <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[8px] font-mono tracking-wider transition-opacity duration-300
-                            ${connected.includes(star.id) || connected.length === star.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
-                            ${isApollo ? 'text-green-500' : 'text-slate-600'}`}>
-                            {star.name}
-                        </div>
-                    </div>
-                ))}
+                            {isTargetStar && !isSelected && (
+                                <Star className="w-3 h-3 md:w-4 md:h-4 text-amber-900" fill="currentColor" />
+                            )}
+                        </motion.button>
+                    );
+                })}
+
+                {/* Star names (show when selected) */}
+                <AnimatePresence>
+                    {selectedStars.map(starId => {
+                        const star = stars.find(s => s.id === starId);
+                        if (!star || !star.name) return null;
+
+                        return (
+                            <motion.div
+                                key={`name-${starId}`}
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className={`
+                                    absolute text-xs font-mono pointer-events-none
+                                    ${isApollo ? 'text-green-400' : 'text-amber-400'}
+                                `}
+                                style={{
+                                    left: `${star.x}%`,
+                                    top: `${star.y + 8}%`,
+                                    transform: 'translateX(-50%)'
+                                }}
+                            >
+                                {star.name}
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
+
+                {/* Complete overlay */}
+                <AnimatePresence>
+                    {isComplete && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="absolute inset-0 bg-green-900/50 flex items-center justify-center"
+                        >
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="text-center"
+                            >
+                                <Check className="w-16 h-16 text-green-400 mx-auto mb-2" />
+                                <div className="text-green-400 font-bold text-lg">Navigation Locked!</div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
-            <div className={`h-8 font-mono text-sm tracking-widest uppercase transition-colors duration-200
-                ${shaking ? 'text-red-500' : connected.length === stars.length ? (isApollo ? 'text-green-500' : 'text-green-400') : (isApollo ? 'text-green-700' : 'text-amber-500')}`}>
-                {message}
+            {/* Legend */}
+            <div className="flex items-center gap-6 text-xs">
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"></div>
+                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Navigation Star</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                    </div>
+                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Found</span>
+                </div>
+            </div>
+
+            {/* Educational Tip */}
+            <div className={`text-xs text-center max-w-xs ${isApollo ? 'text-green-700' : 'text-slate-500'}`}>
+                <strong>Did you know?</strong> Apollo astronauts used 37 navigation stars to orient
+                their spacecraft. Polaris (the North Star) was especially important!
             </div>
         </div>
     );
