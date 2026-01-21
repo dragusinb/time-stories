@@ -13,20 +13,35 @@ const DiagnosisGame: React.FC<DiagnosisGameProps> = ({ minigame, onComplete, the
     const [focus, setFocus] = useState(0); // 0 to 100, target 50
     const [magnification, setMagnification] = useState(1); // 1x, 2x, 4x
     const [identified, setIdentified] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const targetFocus = 50;
     const tolerance = 10;
 
     const handleFocus = (delta: number) => {
         setFocus(prev => Math.max(0, Math.min(100, prev + delta)));
+        setErrorMessage(null);
     };
 
     const handleIdentify = () => {
-        if (Math.abs(focus - targetFocus) <= tolerance && magnification === 4) {
+        const focusOk = Math.abs(focus - targetFocus) <= tolerance;
+        const magOk = magnification === 4;
+
+        if (focusOk && magOk) {
             setIdentified(true);
+            setErrorMessage(null);
             setTimeout(() => onComplete(100), 1500);
         } else {
-            // Feedback
+            // Provide specific feedback
+            if (!magOk && !focusOk) {
+                setErrorMessage("Increase magnification to 4x and adjust focus");
+            } else if (!magOk) {
+                setErrorMessage("Magnification too low - set to 4x");
+            } else {
+                setErrorMessage("Image blurry - adjust focus to center");
+            }
+            // Clear error after delay
+            setTimeout(() => setErrorMessage(null), 3000);
         }
     };
 
@@ -93,7 +108,7 @@ const DiagnosisGame: React.FC<DiagnosisGameProps> = ({ minigame, onComplete, the
                         {[1, 2, 4].map(m => (
                             <button
                                 key={m}
-                                onClick={() => setMagnification(m)}
+                                onClick={() => { setMagnification(m); setErrorMessage(null); }}
                                 className={`px-2 py-1 text-xs font-bold rounded ${magnification === m
                                         ? (isApollo ? 'bg-green-600 text-black' : 'bg-blue-600 text-white')
                                         : (isApollo ? 'bg-black text-green-700 border border-green-900' : 'bg-slate-700 text-slate-400')
@@ -119,10 +134,17 @@ const DiagnosisGame: React.FC<DiagnosisGameProps> = ({ minigame, onComplete, the
                     </div>
                 </div>
 
+                {/* Error Message */}
+                {errorMessage && (
+                    <div className={`p-2 rounded text-xs font-mono text-center animate-pulse ${isApollo ? 'bg-red-900/30 border border-red-700 text-red-400' : 'bg-red-900/30 border border-red-700 text-red-400'}`}>
+                        {errorMessage}
+                    </div>
+                )}
+
                 <Button
                     onClick={handleIdentify}
                     disabled={identified}
-                    className={`w-full py-4 text-sm font-bold tracking-widest uppercase border-b-4 border-r-4 active:border-0 active:translate-y-1 active:translate-x-1 outline-none transition-none 
+                    className={`w-full py-4 text-sm font-bold tracking-widest uppercase border-b-4 border-r-4 active:border-0 active:translate-y-1 active:translate-x-1 outline-none transition-none
                         ${identified
                             ? (isApollo ? 'bg-green-600 text-black border-green-900' : 'bg-green-600 border-green-800 text-white')
                             : (isApollo ? 'bg-black text-green-500 border-green-700 hover:bg-green-900/20' : 'bg-blue-600 border-blue-800 text-white hover:bg-blue-500')

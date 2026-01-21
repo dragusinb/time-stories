@@ -1,108 +1,227 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Minigame } from '@/types';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { RefreshCw, CheckCircle2 } from 'lucide-react';
 
 interface CircleGameProps {
     minigame: Minigame;
-    onComplete: (success: boolean) => void;
+    onComplete: (score: number) => void;
 }
 
 export const CircleGame: React.FC<CircleGameProps> = ({ minigame, onComplete }) => {
-    const [radius, setRadius] = useState(10);
-    const [circumferenceInput, setCircumferenceInput] = useState("");
-    const [areaInput, setAreaInput] = useState("");
-    const [message, setMessage] = useState("Calculate the Circumference (2*pi*r) and Area (pi*r^2). Use pi = 3.14");
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+    const [score, setScore] = useState<number | null>(null);
+    const [message, setMessage] = useState("Draw a perfect circle in the sand.");
+    const [center, setCenter] = useState<{ x: number; y: number } | null>(null);
 
-    const checkAnswer = () => {
-        const pi = 3.14;
-        const expectedC = 2 * pi * radius;
-        const expectedA = pi * radius * radius;
+    // Canvas Setup
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        const userC = parseFloat(circumferenceInput);
-        const userA = parseFloat(areaInput);
+        // High DPI scaling
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
 
-        if (Math.abs(userC - expectedC) < 0.1 && Math.abs(userA - expectedA) < 0.1) {
-            setMessage("Correct! The geometry is perfect.");
-            setTimeout(() => onComplete(true), 1500);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.scale(dpr, dpr);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#d4b483'; // Sand light color
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 2;
+            ctx.lineWidth = 4;
+        }
+    }, []);
+
+    // Drawing Handlers
+    const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+        if (score !== null) return; // Game over
+        setIsDrawing(true);
+        setPoints([]);
+        setScore(null);
+        setCenter(null);
+        setMessage("Drawing...");
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    };
+
+    const draw = (e: React.MouseEvent | React.TouchEvent) => {
+        if (!isDrawing || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+
+        // Get coordinates
+        let clientX, clientY;
+        if ('touches' in e) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
         } else {
-            setMessage("Incorrect. Check your calculations.");
+            clientX = (e as React.MouseEvent).clientX;
+            clientY = (e as React.MouseEvent).clientY;
+        }
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        // Add point
+        const newPoints = [...points, { x, y }];
+        setPoints(newPoints);
+
+        // Draw visual
+        const ctx = canvas.getContext('2d');
+        if (ctx && newPoints.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(points[points.length - 1].x, points[points.length - 1].y);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+    };
+
+    const stopDrawing = () => {
+        if (!isDrawing) return;
+        setIsDrawing(false);
+        calculateScore();
+    };
+
+    const calculateScore = () => {
+        if (points.length < 20) {
+            setMessage("Too small! Draw a bigger circle.");
+            return;
+        }
+
+        // 1. Calculate Centroid (Center)
+        let sumX = 0, sumY = 0;
+        points.forEach(p => { sumX += p.x; sumY += p.y; });
+        const centerX = sumX / points.length;
+        const centerY = sumY / points.length;
+        setCenter({ x: centerX, y: centerY });
+
+        // 2. Calculate Average Radius
+        let totalRadius = 0;
+        points.forEach(p => {
+            totalRadius += Math.sqrt(Math.pow(p.x - centerX, 2) + Math.pow(p.y - centerY, 2));
+        });
+        const avgRadius = totalRadius / points.length;
+
+        // 3. Calculate Variance/Error
+        let totalError = 0;
+        points.forEach(p => {
+            const r = Math.sqrt(Math.pow(p.x - centerX, 2) + Math.pow(p.y - centerY, 2));
+            totalError += Math.abs(r - avgRadius);
+        });
+
+        // Normalize Error (Average deviation as percentage of radius)
+        const avgError = totalError / points.length;
+        const errorPercent = avgError / avgRadius;
+
+        // 4. Calculate Closure (Did start meet end?)
+        const start = points[0];
+        const end = points[points.length - 1];
+        const gap = Math.sqrt(Math.pow(start.x - end.x, 2) + Math.pow(start.y - end.y, 2));
+        const gapPenalty = Math.min(1, gap / (avgRadius * 0.5)); // Penalty if gap is > 50% of radius
+
+        // Final Score (100 - error - gap)
+        // A perfect circle has 0 error. We want to be lenient.
+        // Multiplier helps scale difficulty.
+        const accuracy = Math.max(0, 100 - (errorPercent * 500) - (gapPenalty * 20));
+        const finalScore = Math.round(accuracy);
+
+        setScore(finalScore);
+
+        if (finalScore >= 80) {
+            setMessage(`Excellent! ${finalScore}% Perfect.`);
+            setTimeout(() => onComplete(100), 1000);
+        } else {
+            setMessage(`Not quite round enough (${finalScore}%). Try again!`);
+        }
+
+        // Draw debug visuals (Perfect circle overlay)
+        const ctx = canvasRef.current?.getContext('2d');
+        if (ctx) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(50, 200, 50, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.arc(centerX, centerY, avgRadius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    };
+
+    const reset = () => {
+        setPoints([]);
+        setScore(null);
+        setCenter(null);
+        setMessage("Draw a perfect circle in the sand.");
+        const ctx = canvasRef.current?.getContext('2d');
+        if (ctx && canvasRef.current) {
+            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         }
     };
 
     return (
-        <div className="flex flex-col items-center space-y-6 p-6 bg-slate-900 border-4 border-amber-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+        <div className="flex flex-col items-center space-y-4 p-6 bg-slate-900 border-4 border-amber-800 shadow-xl max-w-lg mx-auto select-none">
             <div className="text-center">
-                <h3 className="text-xl font-serif text-amber-500 mb-2 tracking-widest uppercase">{minigame.question}</h3>
-                <p className="text-slate-400 text-xs font-mono">{minigame.instructions}</p>
+                <h3 className="text-lg font-serif text-amber-500 tracking-widest uppercase">The Perfect Circle</h3>
+                <p className="text-xs text-slate-400 font-mono mt-1">{message}</p>
             </div>
 
-            {/* Visual Aid: Sand Drawing */}
-            <div className="relative w-64 h-64 bg-[#d4b483] border-4 border-[#8c6b3f] flex items-center justify-center overflow-hidden shadow-inner">
-                <div className="absolute inset-0 opacity-20 bg-[url('/images/noise.png')]"></div>
+            <div className="relative w-full aspect-square max-w-[300px] bg-[#c2a47c] border-4 border-[#8c6b3f] shadow-inner rounded-sm overflow-hidden cursor-crosshair touch-none">
+                {/* Sand Texture / Noise Background */}
+                <div className="absolute inset-0 opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
+                <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply bg-amber-900"></div>
 
-                {/* The Circle */}
-                <div
-                    className="border-4 border-slate-800 rounded-full flex items-center justify-center transition-all duration-500 relative"
-                    style={{ width: `${radius * 10}px`, height: `${radius * 10}px` }}
-                >
-                    {/* Radius Line */}
-                    <div className="absolute w-1/2 h-0.5 bg-red-600 right-0 top-1/2" style={{ width: `${radius * 5}px` }}></div>
-                    <span className="absolute text-xs font-bold text-red-800 -mt-6 ml-6 font-mono">r={radius}</span>
+                <canvas
+                    ref={canvasRef}
+                    className="w-full h-full relative z-10"
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
+                />
 
-                    {/* Center Point */}
-                    <div className="absolute w-2 h-2 bg-slate-800 rounded-full"></div>
+                {center && score !== null && (
+                    <div
+                        className="absolute w-2 h-2 bg-red-500 rounded-full z-20 pointer-events-none transform -translate-x-1/2 -translate-y-1/2"
+                        style={{ left: center.x, top: center.y }}
+                    ></div>
+                )}
+            </div>
+
+            <div className="flex justify-between w-full max-w-[300px] items-center">
+                <div className="flex items-center space-x-2">
+                    <span className="text-xs font-mono text-slate-500">History's Record: 96%</span>
                 </div>
 
-                <span className="absolute bottom-2 right-2 text-[10px] text-[#8c6b3f] font-serif italic">Archimedes' Sand Pit</span>
+                {score !== null && score < 80 && (
+                    <Button onClick={reset} className="bg-amber-700 hover:bg-amber-600 text-white text-xs px-4 py-2 border-amber-900">
+                        <RefreshCw className="w-3 h-3 mr-2" /> Smoother...
+                    </Button>
+                )}
+                {score !== null && score >= 80 && (
+                    <div className="text-green-500 font-bold flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5" /> PASSED
+                    </div>
+                )}
             </div>
 
-            <div className="flex space-x-4">
-                {[5, 10, 15].map(r => (
-                    <button
-                        key={r}
-                        onClick={() => setRadius(r)}
-                        className={`px-3 py-1 text-xs font-mono border-2 transition-all ${radius === r
-                                ? 'bg-amber-500 border-amber-600 text-white'
-                                : 'bg-slate-800 border-slate-600 text-slate-400 hover:bg-slate-700'
-                            }`}
-                    >
-                        r={r}
-                    </button>
-                ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                <div className="space-y-2">
-                    <label className="text-xs text-slate-400 font-mono uppercase">Circumference (C)</label>
-                    <Input
-                        type="number"
-                        placeholder="2 * 3.14 * r"
-                        value={circumferenceInput}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCircumferenceInput(e.target.value)}
-                        className="bg-slate-800 border-2 border-slate-600 text-white font-mono focus:border-amber-500 rounded-none"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs text-slate-400 font-mono uppercase">Area (A)</label>
-                    <Input
-                        type="number"
-                        placeholder="3.14 * r^2"
-                        value={areaInput}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAreaInput(e.target.value)}
-                        className="bg-slate-800 border-2 border-slate-600 text-white font-mono focus:border-amber-500 rounded-none"
-                    />
-                </div>
-            </div>
-
-            <div className="h-8 text-amber-400 font-bold font-mono text-sm uppercase tracking-wider">{message}</div>
-
-            <Button
-                onClick={checkAnswer}
-                className="pixel-btn-primary w-full py-4 text-lg uppercase tracking-widest"
-            >
-                Verify Calculations
-            </Button>
+            <p className="text-[10px] text-slate-600 font-mono text-center max-w-xs">
+                Archimedes says: "A circle is the locus of points equidistant from a center."
+                <br />Try to keep your hand steady!
+            </p>
         </div>
     );
 };

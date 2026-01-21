@@ -44,11 +44,27 @@ const GearsGame: React.FC<GearsGameProps> = ({ minigame, onComplete }) => {
             return;
         }
 
-        setIsRunning(true);
-        setMessage("Engaging mechanism...");
+        // Validate gear arrangement - gears must alternate in size for proper meshing
+        // Valid patterns: small-large-small, large-small-large, or ascending/descending
+        const sizes = slots.map(s => s === 'small' ? 1 : s === 'medium' ? 2 : 3);
 
-        // Win condition: Just completing the chain is enough for this simple puzzle
-        // Visual reward is the mirror turning
+        // Check if gears can mesh (adjacent gears should differ in size)
+        const canMesh = (sizes[0] !== sizes[1]) && (sizes[1] !== sizes[2]);
+
+        // For optimal torque transfer, we want: large -> medium -> small (3,2,1)
+        const isOptimal = sizes[0] === 3 && sizes[1] === 2 && sizes[2] === 1;
+
+        if (!canMesh) {
+            setMessage("Gears jam! Adjacent gears cannot be the same size.");
+            // Visual shake feedback
+            setTimeout(() => setMessage("Reconfigure the gear train."), 2000);
+            return;
+        }
+
+        setIsRunning(true);
+        setMessage(isOptimal ? "Optimal configuration! Engaging..." : "Engaging mechanism...");
+
+        // Win condition: Gears mesh properly
         setTimeout(() => {
             setMessage("Target Acquired. Ray Focused.");
             setTimeout(() => onComplete(100), 2000);

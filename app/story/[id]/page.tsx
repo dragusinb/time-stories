@@ -1,9 +1,15 @@
 import { Navbar } from '@/components/Navbar';
-import { getStory } from '@/lib/data';
+import { getStory, stories } from '@/lib/data';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Clock, MapPin, BookOpen } from 'lucide-react';
+
+export async function generateStaticParams() {
+    return stories.map((story) => ({
+        id: story.id,
+    }));
+}
 
 interface PageProps {
     params: Promise<{ id: string }>;

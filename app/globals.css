@@ -4,10 +4,8 @@
   --font-sans: var(--font-outfit);
   --font-serif: var(--font-cinzel);
 
-  --color-background: #020617;
-  /* slate-950 */
-  --color-foreground: #f8fafc;
-  /* slate-50 */
+  --background: #0a0a0a;
+  --foreground: #ededed;
 
   --color-primary: #f59e0b;
   /* amber-500 */
@@ -36,33 +34,39 @@
 
 :root {
   /* Safe Area Variables */
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
-  --safe-left: env(safe-area-inset-left);
-  --safe-right: env(safe-area-inset-right);
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+
+  /* Native App Feel */
+  /* Native App Feel */
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+
+  user-select: none;
+  /* Disable text selection generally */
+  -webkit-touch-callout: none;
+  /* Disable long-press context menu */
 
   /* Mobile Stability Fixes */
   touch-action: manipulation;
   /* Disable double-tap zoom */
   -webkit-tap-highlight-color: transparent;
   /* Remove tap flash */
-  -webkit-touch-callout: none;
-  /* Disable long-press context menu */
-  user-select: none;
-  /* Prevent text selection */
   overscroll-behavior-y: none;
   /* Prevent bounce scroll */
 
   min-height: 100dvh;
   /* Dynamic viewport height */
-  padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
 }
 
 h1,

@@ -37,6 +37,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { BillingProvider } from '@/components/BillingProvider';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,10 +46,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${outfit.variable} ${cinzel.variable} ${pressStart2P.variable} antialiased bg-slate-950 text-slate-100`}
-      >
-        {children}
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
+      <body className={`${outfit.variable} ${cinzel.variable} antialiased`}>
+        <BillingProvider>
+          {children}
+        </BillingProvider>
       </body>
     </html>
   );

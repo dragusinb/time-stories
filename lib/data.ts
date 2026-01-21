@@ -64,12 +64,10 @@ story1Acts.push(
     createAct(s1, 11, "One Small Step", "You stand on the porch. The ladder is just a few rungs, but it spans a billion years of evolution. You drop the last three feet. The dust puffs silently. The world watches, but you are alone. 'That's one small step for man...'", undefined, "/images/apollo/act-11.png"),
     createAct(s1, 12, "Contingency Sample", "First rule: get a sample. If the engine explodes now, at least we bring something home. You scoop the regolith blindly. It's like wet sand, yet dry as bone. The bag seals with a satisfying snap.", {
         id: 'mg-story-1-12',
-        type: 'mixing',
+        type: 'centrifuge',
         question: "Analyze the Regolith Sample.",
-        instructions: "Centrifuge the sample to separate isotopes. Balance the speed to avoid contamination.",
-        winningCondition: "Isotope Ratio Verified",
-        ingredients: ["Regolith", "Basalt", "Breccia", "Solar Wind"],
-        correctCombination: ["Regolith", "Solar Wind"]
+        instructions: "Hold SPIN to separate isotopes. Keep RPM in the green zone.",
+        winningCondition: "Sample Isolated"
     }, "/images/apollo/act-12.png"),
     createAct(s1, 13, "Magnificent Desolation", "Aldrin joins you. You look out at the horizon. It's too close. The curvature is wrong. The colors are absolute—black sky, white ground. 'Magnificent desolation,' Buzz says. It is beautiful because it is dead.", undefined, "/images/apollo/act-13.png"),
     createAct(s1, 14, "Mobility", "Walking is impossible. You learn to skip, to hop like a kangaroo in slow motion. The 1/6th gravity is a seductive mistress; she lets you fly, but momentum is still a cruel master. You stumble, heart racing. A tear in the suit means death.", undefined, "/images/apollo/act-14.png"),
@@ -205,21 +203,19 @@ story2Acts.push(
     createAct(s2, 12, "The Rat Catcher", "You meet Marco, a rat catcher. He knows the rats are the source, but no one believes him. 'They dance before they die,' he says. You trade him a bottle of your saline mix for three live rats. You need to study the enemy.", {
         id: 'mg-story-2-12',
         type: 'ratcatcher',
-        question: "Catch 3 Rats.",
-        instructions: "Tap the rats before they hide!",
-        winningCondition: "Collect 3 Live Specimens"
+        question: "Capture the Specimen",
+        instructions: "Herd the rats into the CAGE using your mouse repulsor.",
+        winningCondition: "All Rats Secured"
     }, "/images/alchemist/act-12.png"),
     createAct(s2, 13, "The Flea", "Under a crude magnifying glass you ground from a broken bottle, you examine the rats. You see them—fleas. Gorged with blood. The vector. It's not the air; it's the bite.", undefined, "/images/alchemist/act-13.png"),
     createAct(s2, 14, "The Theory", "You try to explain the flea theory to Ghiberti. He strikes you. 'Heresy! It is God's wrath, you insolent fool!' You learn a valuable lesson: Truth without authority is dangerous. You must keep your mouth shut and your eyes open.", undefined, "/images/alchemist/act-14.png"),
     createAct(s2, 15, "The Mixture", "You refine your lemon-sulfur mix, adding vinegar and garlic. You call it 'Four Thieves Vinegar'. It kills the fleas on the rats instantly. You have a weapon.", undefined, "/images/alchemist/act-15.png"),
     createAct(s2, 16, "The Mask", "You design a mask with a long beak to hold vinegar-soaked sponges. It looks terrifying, like a demon bird, but it filters the air and repels fleas. You are the first 'Beak Doctor'.", {
         id: 'mg-story-2-16',
-        type: 'mixing',
-        question: "Brew the Four Thieves Vinegar to soak the mask filters.",
-        instructions: "Combine Vinegar, Garlic, and Wormwood, then Boil to infuse.",
-        winningCondition: "Combine: Vinegar + Garlic + Wormwood + Boil",
-        ingredients: ["Vinegar", "Garlic", "Wormwood", "Mercury", "Boil", "Lead"],
-        correctCombination: ["Vinegar", "Garlic", "Wormwood", "Boil"]
+        type: 'grinding',
+        question: "Prepare the Mask Filter.",
+        instructions: "Grind the herbs by circling your mouse until the paste is smooth. Crush any chunks!",
+        winningCondition: "Paste Consistency 100%"
     }, "/images/alchemist/act-16.png"),
     createAct(s2, 17, "The Patrol", "You walk the streets in your mask. People flee from you, crossing themselves. You are a symbol of death, but you are bringing life. You spray the vinegar in the alleys where the rats gather.", undefined, "/images/alchemist/act-17.png"),
     createAct(s2, 18, "The Survivor", "You find a man who survived the Buboes. His blood... it might hold the key. Antibodies? You take a sample, paying him with bread. Ghiberti would have bled him dry.", undefined, "/images/alchemist/act-18.png"),
@@ -291,9 +287,9 @@ story3Acts.push(
     createAct(s3, 2, "The Old Man", "You find him drawing circles in the sand near the harbor. Archimedes. The greatest mind of antiquity. He doesn't even look up as you approach. 'Do not disturb my circles,' he mutters.", {
         id: 'mg-story-3-2',
         type: 'circle',
-        question: "Calculate the exact value of Pi.",
-        instructions: "Measure the circumference and area of the sand circles.",
-        winningCondition: "Precision < 0.01"
+        question: "Draw a Perfect Circle",
+        instructions: "Trace a perfect circle in the sand with your finger or mouse. Aim for >80% accuracy.",
+        winningCondition: "Roundness > 80%"
     }, "/images/archimedes/act-2.png"),
     createAct(s3, 3, "The Roman Fleet", "Ships approach the harbor. General Marcellus leads the Roman fleet. 'They are coming,' you say. Archimedes smiles, wiping the sand from his hands. 'Let them come. I have a surprise.'", undefined, "/images/archimedes/act-3.png"),
     createAct(s3, 4, "The Iron Hand", "He points to a massive crane on the wall. 'The Claw,' he whispers. 'It will lift their ships like toys. But it needs a precise operator.' He looks at you.", {
@@ -312,7 +308,7 @@ story3Acts.push(
         id: 'mg-story-3-10',
         type: 'displacement',
         question: "The Eureka Moment",
-        instructions: "Submerge the items to compare their water displacement. Identify the fake.",
+        instructions: "Drop both items in the water. Which one makes the water rise higher?",
         winningCondition: "Identify the Fake Crown"
     }, "/images/archimedes/act-10.png")
 );

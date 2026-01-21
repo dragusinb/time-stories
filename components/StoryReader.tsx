@@ -35,6 +35,8 @@ import TriageGame from './minigames/TriageGame';
 import { RatCatcherGame } from './minigames/RatCatcherGame';
 import { QuizGame } from './minigames/QuizGame';
 import { ParticleOverlay } from './ui/ParticleOverlay';
+import { CentrifugeGame } from './minigames/CentrifugeGame';
+import { GrindingGame } from './minigames/GrindingGame';
 
 interface StoryReaderProps {
     story: Story;
@@ -572,6 +574,14 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
 
     if (minigame.type === 'ratcatcher') {
         return <RatCatcherGame minigame={minigame} onComplete={onComplete} />;
+    }
+
+    if (minigame.type === 'centrifuge') {
+        return <CentrifugeGame minigame={minigame} onComplete={onComplete} />;
+    }
+
+    if (minigame.type === 'grinding') {
+        return <GrindingGame minigame={minigame} onComplete={onComplete} />;
     }
 
     // Default to Quiz

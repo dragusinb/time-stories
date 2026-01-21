@@ -1,7 +1,13 @@
 import { Navbar } from '@/components/Navbar';
 import { StoryReader } from '@/components/StoryReader';
-import { getStory } from '@/lib/data';
+import { getStory, stories } from '@/lib/data';
 import { notFound } from 'next/navigation';
+
+export async function generateStaticParams() {
+    return stories.map((story) => ({
+        id: story.id,
+    }));
+}
 
 interface PageProps {
     params: Promise<{ id: string }>;

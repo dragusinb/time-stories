@@ -1,204 +1,207 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Minigame } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Rat, Timer, Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Flag } from 'lucide-react';
 
-interface RatCatcherGameProps {
+interface RatHerdingGameProps {
     minigame: Minigame;
     onComplete: (score: number) => void;
 }
 
-interface RatEntity {
+// Simple vector types
+type Vector = { x: number; y: number };
+
+// Rat Entity
+interface Rat {
     id: number;
-    delay: number;
-    duration: number;
-    y: number; // Vertical lane (10-90%)
-    size: number;
+    pos: Vector;
+    vel: Vector;
 }
 
-export const RatCatcherGame: React.FC<RatCatcherGameProps> = ({ minigame, onComplete }) => {
-    const [score, setScore] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(30);
-    const [activeRats, setActiveRats] = useState<RatEntity[]>([]);
-    const [gameOver, setGameOver] = useState(false);
-    const [clickFeedback, setClickFeedback] = useState<{ x: number, y: number, id: number }[]>([]);
+const GAME_WIDTH = 400;
+const GAME_HEIGHT = 400;
+const CAGE_RADIUS = 60;
+const RAT_COUNT = 5;
 
-    // Determine target score from props or default
-    const TARGET_SCORE = 3;
+export const RatCatcherGame: React.FC<RatHerdingGameProps> = ({ minigame, onComplete }) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [rats, setRats] = useState<Rat[]>([]);
+    const [capturedCount, setCapturedCount] = useState(0);
+    const [message, setMessage] = useState("Herd the rats into the ZONE!");
+    const [gameState, setGameState] = useState<'playing' | 'won'>('playing');
 
-    // Game Timer
+    // Mouse Pos for "Repulsor"
+    const mouseRef = useRef<Vector>({ x: -1000, y: -1000 });
+
+    // Initialize Rats
     useEffect(() => {
-        if (gameOver) return;
-        const timer = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    setGameOver(true);
-                    onComplete(0); // Fail if time runs out
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [gameOver, onComplete]);
+        const initialRats = Array.from({ length: RAT_COUNT }).map((_, i) => ({
+            id: i,
+            pos: {
+                x: Math.random() * GAME_WIDTH,
+                y: Math.random() * GAME_HEIGHT * 0.5 // Start in top half 
+            },
+            vel: { x: 0, y: 0 }
+        }));
+        setRats(initialRats);
+    }, []);
 
-    // Rat Spawner
+    // Game Loop
     useEffect(() => {
-        if (gameOver) return;
+        if (gameState === 'won') return;
 
-        // Spawn a burst of rats initially, then trickle
-        const initialRats = Array.from({ length: 3 }).map((_, i) => createRat(i));
-        setActiveRats(initialRats);
+        let animationId: number;
+        const ctx = canvasRef.current?.getContext('2d');
 
-        const spawner = setInterval(() => {
-            setActiveRats(prev => {
-                if (prev.length >= 5) return prev; // Max rats onscreen
-                return [...prev, createRat(Date.now())];
+        const loop = () => {
+            if (!ctx) return;
+
+            // Clear
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            // Draw Cage Zone (Bottom Center)
+            const cageX = GAME_WIDTH / 2;
+            const cageY = GAME_HEIGHT - 50;
+
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(50, 200, 50, 0.2)';
+            ctx.strokeStyle = '#22c55e';
+            ctx.arc(cageX, cageY, CAGE_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Update & Draw Rats
+            setRats(prevRats => {
+                let captured = 0;
+
+                const nextRats = prevRats.map(rat => {
+                    const dx = rat.pos.x - mouseRef.current.x;
+                    const dy = rat.pos.y - mouseRef.current.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    // 1. Repulsion from Mouse (Fear)
+                    if (dist < 100) {
+                        const force = (100 - dist) * 0.2;
+                        rat.vel.x += (dx / dist) * force;
+                        rat.vel.y += (dy / dist) * force;
+                    }
+
+                    // 2. Friction
+                    rat.vel.x *= 0.95;
+                    rat.vel.y *= 0.95;
+
+                    // 3. Wall Bounds
+                    if (rat.pos.x < 10) rat.vel.x += 1;
+                    if (rat.pos.x > GAME_WIDTH - 10) rat.vel.x -= 1;
+                    if (rat.pos.y < 10) rat.vel.y += 1;
+                    if (rat.pos.y > GAME_HEIGHT - 10) rat.vel.y -= 1;
+
+                    // Update Pos
+                    rat.pos.x += rat.vel.x;
+                    rat.pos.y += rat.vel.y;
+
+                    // Check Capture
+                    const distToCage = Math.sqrt(Math.pow(rat.pos.x - cageX, 2) + Math.pow(rat.pos.y - cageY, 2));
+                    if (distToCage < CAGE_RADIUS) {
+                        captured++;
+                    }
+
+                    return rat;
+                });
+
+                // Update captured UI state rarely to avoid flicker/perf issues? 
+                // Actually React state update in loop is bad. Let's ref out captured count or throttle setCapturedCount.
+                // For this simple game, we can just do it, or rely on a "checkWin" interval. 
+                // Let's do checkWin outside.
+
+                // Draw Rat
+                nextRats.forEach(rat => {
+                    ctx.save();
+                    ctx.translate(rat.pos.x, rat.pos.y);
+                    // Rotate based on velocity
+                    const angle = Math.atan2(rat.vel.y, rat.vel.x);
+                    ctx.rotate(angle);
+
+                    // Simple Rat Body
+                    ctx.fillStyle = '#a8a29e';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 10, 5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Tail
+                    ctx.strokeStyle = 'pink';
+                    ctx.beginPath();
+                    ctx.moveTo(-10, 0);
+                    ctx.lineTo(-20, 0);
+                    ctx.stroke();
+
+                    ctx.restore();
+                });
+
+                return nextRats;
             });
-        }, 1500);
 
-        return () => clearInterval(spawner);
-    }, [gameOver]);
+            animationId = requestAnimationFrame(loop);
+        };
 
-    const createRat = (seed: number): RatEntity => ({
-        id: seed,
-        delay: Math.random() * 0.5,
-        duration: 2 + Math.random() * 3, // 2-5s to cross screen
-        y: 10 + Math.random() * 80,
-        size: 0.8 + Math.random() * 0.4
-    });
+        animationId = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(animationId);
+    }, [gameState]);
 
-    const handleCatch = (e: React.MouseEvent, ratId: number) => {
-        if (gameOver) return;
-        e.stopPropagation();
+    // Win Check Loop (separate from render to save React updates)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const cageX = GAME_WIDTH / 2;
+            const cageY = GAME_HEIGHT - 50;
+            let currentCaptured = 0;
 
-        // Add feedback effect
-        const rect = (e.target as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top; // Relative to click not ideal, let's use global or simplified
+            rats.forEach(rat => {
+                const dist = Math.sqrt(Math.pow(rat.pos.x - cageX, 2) + Math.pow(rat.pos.y - cageY, 2));
+                if (dist < CAGE_RADIUS) currentCaptured++;
+            });
 
-        setClickFeedback(prev => [...prev, { x: e.clientX, y: e.clientY, id: Date.now() }]);
+            setCapturedCount(currentCaptured);
 
-        // Remove rat
-        setActiveRats(prev => prev.filter(r => r.id !== ratId));
-
-        setScore(prev => {
-            const newScore = prev + 1;
-            if (newScore >= TARGET_SCORE) {
-                setGameOver(true);
-                setTimeout(() => onComplete(100), 1500);
+            if (currentCaptured >= RAT_COUNT) {
+                setGameState('won');
+                setMessage("All Secured!");
+                setTimeout(() => onComplete(100), 1000);
             }
-            return newScore;
-        });
+        }, 500);
+        return () => clearInterval(interval);
+    }, [rats, onComplete]);
+
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (rect) {
+            mouseRef.current = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
     };
 
-    // Cleanup click feedback
-    useEffect(() => {
-        if (clickFeedback.length > 0) {
-            const timer = setTimeout(() => {
-                setClickFeedback(prev => prev.slice(1));
-            }, 500);
-            return () => clearTimeout(timer);
-        }
-    }, [clickFeedback]);
-
     return (
-        <div className="flex flex-col items-center space-y-6 p-6 bg-slate-900 border-4 border-amber-900/50 shadow-2xl font-pixel relative overflow-hidden min-h-[500px] select-none">
-            {/* Header */}
-            <div className="w-full flex justify-between items-center bg-slate-950/90 p-4 rounded border border-amber-900/30 z-20">
-                <div className="flex items-center gap-3">
-                    <Trophy className={`w-6 h-6 ${score >= TARGET_SCORE ? 'text-green-500' : 'text-amber-600'}`} />
-                    <div className="text-amber-500 font-mono text-xl tracking-widest">
-                        CAUGHT: <span className="text-white">{score}</span>/{TARGET_SCORE}
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Timer className={`w-6 h-6 ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-slate-500'}`} />
-                    <div className={`font-mono text-xl ${timeLeft < 10 ? 'text-red-500' : 'text-slate-400'}`}>
-                        {timeLeft}s
-                    </div>
-                </div>
+        <div className="flex flex-col items-center space-y-4 p-6 bg-slate-900 border-4 border-amber-900 shadow-xl max-w-lg mx-auto select-none font-pixel">
+            <div className="text-center">
+                <h3 className="text-xl text-amber-500 tracking-widest uppercase">Rat Roundup</h3>
+                <p className="text-xs text-slate-400 font-mono mt-1">{message}</p>
+                <div className="text-green-400 font-bold mt-2">SECURED: {capturedCount} / {RAT_COUNT}</div>
             </div>
 
-            {/* Game Area */}
-            <div className="relative w-full flex-1 bg-slate-950 border-4 border-slate-800 rounded-lg shadow-inner overflow-hidden cursor-crosshair group">
-                {/* Background Sewer Texture */}
-                <div className="absolute inset-0 opacity-20"
-                    style={{
-                        backgroundImage: 'radial-gradient(circle at 50% 50%, #334155 1px, transparent 1px)',
-                        backgroundSize: '20px 20px'
-                    }}
-                ></div>
+            <canvas
+                ref={canvasRef}
+                width={GAME_WIDTH}
+                height={GAME_HEIGHT}
+                onMouseMove={handleMouseMove}
+                className="bg-slate-800 rounded border-2 border-slate-700 cursor-none touch-none"
+                style={{ width: '100%', maxWidth: '400px', aspectRatio: '1/1' }}
+            />
 
-                {/* Lighting Vignette */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none z-10"></div>
-
-                <AnimatePresence>
-                    {activeRats.map(rat => (
-                        <motion.div
-                            key={rat.id}
-                            initial={{ x: -100, opacity: 0 }}
-                            animate={{ x: '500%', opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                            transition={{
-                                duration: rat.duration,
-                                ease: "linear",
-                                delay: rat.delay,
-                                repeat: Infinity, // Loop them if not caught (optional, or just destroy)
-                                repeatDelay: 1
-                            }}
-                            onAnimationComplete={() => {
-                                // If it runs off screen, maybe remove it?
-                                // For simplicity rely on React state updates or infinite scrolling
-                            }}
-                            className="absolute flex items-center justify-center p-2 rounded-full hover:bg-red-500/10 transition-colors"
-                            style={{
-                                top: `${rat.y}%`,
-                                width: '64px',
-                                height: '64px',
-                            }}
-                            onClick={(e) => handleCatch(e, rat.id)}
-                        >
-                            <Rat
-                                className="text-stone-400 drop-shadow-lg"
-                                style={{
-                                    width: `${40 * rat.size}px`,
-                                    height: `${40 * rat.size}px`,
-                                    transform: 'scaleX(-1)' // Face right
-                                }}
-                            />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
-
-                {/* Click Effects */}
-                {clickFeedback.map(effect => (
-                    <div
-                        key={effect.id}
-                        className="fixed w-8 h-8 rounded-full border-2 border-amber-500/50 animate-ping pointer-events-none z-50"
-                        style={{ left: effect.x - 16, top: effect.y - 16 }}
-                    ></div>
-                ))}
-            </div>
-
-            {/* Status Text */}
-            <div className="text-center z-20 h-8">
-                {score >= TARGET_SCORE ? (
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="text-green-400 font-bold tracking-widest text-lg"
-                    >
-                        SPECIMENS SECURED
-                    </motion.div>
-                ) : (
-                    <p className="text-slate-500 text-sm uppercase tracking-wide">
-                        Tap target to capture • Avoid contact with bite
-                    </p>
-                )}
-            </div>
+            <p className="text-[10px] text-slate-500 font-mono text-center">
+                Move your mouse near rats to scare them away.
+            </p>
         </div>
     );
 };
