@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Story, Act, Minigame } from '@/types';
 import { useStore } from '@/lib/store';
+import { useLabStore, ARTIFACTS } from '@/lib/labStore';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import { Lock, ChevronRight, ChevronLeft, Brain, Trophy } from 'lucide-react';
@@ -47,6 +48,7 @@ export function StoryReader({ story }: StoryReaderProps) {
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const { coins, unlockedActs, unlockAct, spendCoins, completedMinigames, completeMinigame, completeStory } = useStore();
+    const { unlockArtifact } = useLabStore();
 
     const currentAct = story.acts[currentActIndex];
     const isUnlocked = !currentAct.isLocked || unlockedActs.includes(currentAct.id);
@@ -95,8 +97,13 @@ export function StoryReader({ story }: StoryReaderProps) {
     useEffect(() => {
         if (currentActIndex === story.acts.length - 1 && isUnlocked) {
             completeStory(story.id);
+            // Unlock the corresponding artifact in the Lab
+            const artifact = ARTIFACTS.find(a => a.storyId === story.id);
+            if (artifact) {
+                unlockArtifact(artifact.id);
+            }
         }
-    }, [currentActIndex, isUnlocked, story.id, story.acts.length, completeStory]);
+    }, [currentActIndex, isUnlocked, story.id, story.acts.length, completeStory, unlockArtifact]);
 
     const handleUnlock = () => {
         if (spendCoins(currentAct.price)) {

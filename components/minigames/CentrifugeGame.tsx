@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Minigame } from '@/types';
-import { RotateCcw, Check, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CentrifugeGameProps {
     minigame: Minigame;
@@ -12,86 +12,124 @@ interface CentrifugeGameProps {
 }
 
 /**
- * CentrifugeGame - A kid-friendly sample separation game
+ * CentrifugeGame - Rhythm Spin Challenge
  *
- * Educational concept: Centrifuges spin samples at high speeds to separate
- * materials by density. Apollo astronauts used centrifuges to analyze moon rocks!
+ * Gameplay: The centrifuge has a beat! A ring pulses outward rhythmically.
+ * Tap when the ring aligns with the target circle for a "Perfect" or "Good" hit.
+ * Chain good hits to build up speed and separate the sample!
  *
- * Gameplay: Tap the BOOST button to speed up. Keep the needle in the green zone.
- * The centrifuge naturally slows down, so keep tapping!
+ * Skill: Rhythm and timing. Feel the beat!
  */
 export const CentrifugeGame: React.FC<CentrifugeGameProps> = ({ minigame, onComplete, theme = 'apollo' }) => {
-    const [speed, setSpeed] = useState(0); // 0-100
-    const [progress, setProgress] = useState(0); // 0-100
+    const [progress, setProgress] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
     const [rotation, setRotation] = useState(0);
+    const [ringScale, setRingScale] = useState(0.3);
+    const [combo, setCombo] = useState(0);
+    const [lastHit, setLastHit] = useState<'perfect' | 'good' | 'miss' | null>(null);
+    const [speed, setSpeed] = useState(30); // RPM visual
 
-    // Target zone: 60-80 speed
-    const TARGET_MIN = 60;
-    const TARGET_MAX = 80;
-    const BOOST_AMOUNT = 15;
-    const DECAY_RATE = 0.5;
-    const PROGRESS_RATE = 1;
+    // Timing windows
+    const PERFECT_MIN = 0.85;
+    const PERFECT_MAX = 1.0;
+    const GOOD_MIN = 0.7;
+    const GOOD_MAX = 1.15;
+    const BEAT_DURATION = 1200; // ms per beat
 
     const animationRef = useRef<number | null>(null);
-    const speedRef = useRef(0);
+    const beatStartRef = useRef(Date.now());
     const progressRef = useRef(0);
 
-    const inTargetZone = speed >= TARGET_MIN && speed <= TARGET_MAX;
+    const isApollo = theme === 'apollo';
 
+    // Ring expansion animation (the "beat")
     useEffect(() => {
+        if (isComplete) return;
+
         const animate = () => {
-            if (isComplete) return;
+            const now = Date.now();
+            const elapsed = (now - beatStartRef.current) % BEAT_DURATION;
+            const beatProgress = elapsed / BEAT_DURATION;
 
-            // Decay speed over time
-            speedRef.current = Math.max(0, speedRef.current - DECAY_RATE);
-            setSpeed(speedRef.current);
+            // Ring expands from 0.3 to 1.2, then resets
+            setRingScale(0.3 + beatProgress * 0.9);
 
-            // Update rotation for visual
-            setRotation(prev => prev + speedRef.current * 0.5);
-
-            // Progress when in target zone
-            const currentInZone = speedRef.current >= TARGET_MIN && speedRef.current <= TARGET_MAX;
-            if (currentInZone) {
-                progressRef.current = Math.min(100, progressRef.current + PROGRESS_RATE);
-                setProgress(progressRef.current);
-
-                if (progressRef.current >= 100) {
-                    setIsComplete(true);
-                    setTimeout(() => onComplete(100), 1500);
-                    return;
-                }
-            }
+            // Spin the centrifuge based on current speed
+            setRotation(prev => prev + speed * 0.1);
 
             animationRef.current = requestAnimationFrame(animate);
         };
 
         animationRef.current = requestAnimationFrame(animate);
+
         return () => {
-            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+            }
         };
-    }, [isComplete, onComplete]);
+    }, [isComplete, speed]);
 
-    const handleBoost = () => {
+    const handleTap = useCallback(() => {
         if (isComplete) return;
-        speedRef.current = Math.min(100, speedRef.current + BOOST_AMOUNT);
-        setSpeed(speedRef.current);
+
+        const now = Date.now();
+        const elapsed = (now - beatStartRef.current) % BEAT_DURATION;
+        const beatProgress = elapsed / BEAT_DURATION;
+
+        // Check timing
+        let hitType: 'perfect' | 'good' | 'miss';
+        let progressGain = 0;
+        let speedGain = 0;
+
+        if (beatProgress >= PERFECT_MIN && beatProgress <= PERFECT_MAX) {
+            hitType = 'perfect';
+            progressGain = 8 + combo * 2;
+            speedGain = 15;
+            setCombo(prev => prev + 1);
+        } else if (beatProgress >= GOOD_MIN && beatProgress <= GOOD_MAX) {
+            hitType = 'good';
+            progressGain = 5 + combo;
+            speedGain = 8;
+            setCombo(prev => prev + 1);
+        } else {
+            hitType = 'miss';
+            progressGain = -2;
+            speedGain = -20;
+            setCombo(0);
+        }
+
+        setLastHit(hitType);
+        setTimeout(() => setLastHit(null), 300);
+
+        // Update progress
+        progressRef.current = Math.max(0, Math.min(100, progressRef.current + progressGain));
+        setProgress(progressRef.current);
+
+        // Update speed (visual only)
+        setSpeed(prev => Math.max(20, Math.min(120, prev + speedGain)));
+
+        // Check completion
+        if (progressRef.current >= 100) {
+            setIsComplete(true);
+            const score = 70 + Math.min(30, combo * 3);
+            setTimeout(() => onComplete(score), 1500);
+        }
+    }, [isComplete, combo, onComplete]);
+
+    // Calculate ring color based on timing
+    const getRingColor = () => {
+        if (ringScale >= PERFECT_MIN && ringScale <= PERFECT_MAX) {
+            return 'border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.8)]';
+        }
+        if (ringScale >= GOOD_MIN && ringScale <= GOOD_MAX) {
+            return 'border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.6)]';
+        }
+        return isApollo ? 'border-green-800' : 'border-slate-600';
     };
-
-    const isApollo = theme === 'apollo';
-
-    // Speed zone status
-    const getSpeedStatus = () => {
-        if (speed < TARGET_MIN) return { text: 'Too Slow', color: 'text-amber-400' };
-        if (speed > TARGET_MAX) return { text: 'Too Fast!', color: 'text-red-400' };
-        return { text: 'Perfect!', color: 'text-green-400' };
-    };
-
-    const status = getSpeedStatus();
 
     return (
         <div className={`
-            flex flex-col items-center gap-6 p-6 rounded-xl border-2
+            flex flex-col items-center gap-4 p-4 md:p-6 rounded-xl border-2
             ${isApollo
                 ? 'bg-slate-950 border-green-900/50'
                 : 'bg-slate-900 border-slate-700'
@@ -99,30 +137,62 @@ export const CentrifugeGame: React.FC<CentrifugeGameProps> = ({ minigame, onComp
         `}>
             {/* Header */}
             <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-2">{minigame.question}</h3>
-                <p className={`text-sm ${isApollo ? 'text-green-600' : 'text-slate-400'}`}>
-                    {minigame.instructions || 'Tap BOOST to spin. Keep the speed in the green zone!'}
+                <h3 className="text-lg md:text-xl font-bold text-white mb-1">{minigame.question}</h3>
+                <p className={`text-xs md:text-sm ${isApollo ? 'text-green-600' : 'text-slate-400'}`}>
+                    Tap when the ring hits the target circle!
                 </p>
             </div>
 
-            {/* Centrifuge Visual */}
-            <div className="relative">
-                {/* Outer ring */}
-                <div className={`
-                    w-48 h-48 rounded-full border-8 flex items-center justify-center
-                    ${isApollo ? 'border-green-900 bg-black' : 'border-slate-700 bg-slate-900'}
-                `}>
-                    {/* Spinning disc */}
+            {/* Stats Row */}
+            <div className="flex items-center justify-between w-full max-w-xs text-sm">
+                <div className={`flex items-center gap-1 ${isApollo ? 'text-green-500' : 'text-amber-500'}`}>
+                    <Zap className="w-4 h-4" />
+                    <span className="font-mono">{Math.round(speed)} RPM</span>
+                </div>
+                {combo > 0 && (
                     <motion.div
-                        className={`
-                            w-36 h-36 rounded-full border-4 flex items-center justify-center
-                            ${inTargetZone
-                                ? 'border-green-500 bg-green-900/30'
-                                : isApollo
-                                    ? 'border-green-700 bg-green-950/50'
-                                    : 'border-slate-600 bg-slate-800'
-                            }
-                        `}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="px-2 py-1 bg-amber-500 text-black rounded font-bold text-xs"
+                    >
+                        {combo}x COMBO
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Centrifuge Visual */}
+            <div
+                className="relative w-64 h-64 md:w-72 md:h-72 cursor-pointer select-none"
+                onClick={handleTap}
+            >
+                {/* Target ring (the goal) */}
+                <div className={`
+                    absolute inset-4 rounded-full border-4 border-dashed
+                    ${isApollo ? 'border-green-500/50' : 'border-amber-500/50'}
+                `} />
+
+                {/* Expanding beat ring */}
+                <motion.div
+                    className={`
+                        absolute rounded-full border-4 transition-colors duration-100
+                        ${getRingColor()}
+                    `}
+                    style={{
+                        width: `${ringScale * 100}%`,
+                        height: `${ringScale * 100}%`,
+                        left: `${(1 - ringScale) * 50}%`,
+                        top: `${(1 - ringScale) * 50}%`,
+                    }}
+                />
+
+                {/* Centrifuge disc */}
+                <div className={`
+                    absolute inset-12 md:inset-14 rounded-full border-4
+                    ${isApollo ? 'border-green-700 bg-green-950/50' : 'border-slate-600 bg-slate-800'}
+                `}>
+                    {/* Spinning inner disc */}
+                    <motion.div
+                        className="absolute inset-2 rounded-full bg-gradient-to-br from-slate-700 to-slate-900"
                         style={{ transform: `rotate(${rotation}deg)` }}
                     >
                         {/* Sample slots */}
@@ -130,122 +200,125 @@ export const CentrifugeGame: React.FC<CentrifugeGameProps> = ({ minigame, onComp
                             <div
                                 key={angle}
                                 className={`
-                                    absolute w-4 h-4 rounded-full
-                                    ${inTargetZone ? 'bg-green-400' : 'bg-slate-500'}
+                                    absolute w-3 h-3 md:w-4 md:h-4 rounded-full
+                                    ${progress > (angle / 360) * 100
+                                        ? 'bg-green-400 shadow-[0_0_8px_rgba(34,197,94,0.6)]'
+                                        : isApollo ? 'bg-green-900' : 'bg-slate-600'
+                                    }
                                 `}
                                 style={{
-                                    transform: `rotate(${angle}deg) translateY(-50px)`
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: `rotate(${angle}deg) translateY(-200%) translateX(-50%)`
                                 }}
                             />
                         ))}
 
-                        {/* Center */}
+                        {/* Center hub */}
                         <div className={`
-                            w-8 h-8 rounded-full
-                            ${inTargetZone ? 'bg-green-500' : isApollo ? 'bg-green-800' : 'bg-slate-600'}
+                            absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                            w-6 h-6 md:w-8 md:h-8 rounded-full
+                            ${isApollo ? 'bg-green-600' : 'bg-amber-600'}
                         `} />
                     </motion.div>
                 </div>
 
-                {/* Glow effect when in zone */}
-                {inTargetZone && (
-                    <div className="absolute inset-0 rounded-full bg-green-500/20 blur-xl pointer-events-none" />
-                )}
-            </div>
+                {/* Hit feedback */}
+                <AnimatePresence>
+                    {lastHit && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5, y: 0 }}
+                            animate={{ opacity: 1, scale: 1, y: -20 }}
+                            exit={{ opacity: 0, y: -40 }}
+                            className={`
+                                absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                                px-4 py-2 rounded-lg text-lg font-bold
+                                ${lastHit === 'perfect'
+                                    ? 'bg-green-500 text-white'
+                                    : lastHit === 'good'
+                                        ? 'bg-amber-500 text-black'
+                                        : 'bg-red-500 text-white'
+                                }
+                            `}
+                        >
+                            {lastHit === 'perfect' ? 'PERFECT!' : lastHit === 'good' ? 'GOOD!' : 'MISS'}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-            {/* Speed Gauge */}
-            <div className="w-full max-w-xs">
-                <div className="flex justify-between text-xs mb-1">
-                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Speed</span>
-                    <span className={status.color}>{status.text}</span>
-                </div>
-                <div className={`h-6 rounded-full overflow-hidden relative ${isApollo ? 'bg-black border border-green-900' : 'bg-slate-800'}`}>
-                    {/* Target zone indicator */}
-                    <div
-                        className="absolute h-full bg-green-500/20"
-                        style={{
-                            left: `${TARGET_MIN}%`,
-                            width: `${TARGET_MAX - TARGET_MIN}%`
-                        }}
-                    />
-
-                    {/* Speed bar */}
+                {/* Tap instruction */}
+                {!isComplete && progress < 20 && (
                     <motion.div
-                        className={`h-full ${
-                            inTargetZone
-                                ? 'bg-green-500'
-                                : speed > TARGET_MAX
-                                    ? 'bg-red-500'
-                                    : isApollo
-                                        ? 'bg-green-700'
-                                        : 'bg-amber-500'
-                        }`}
-                        style={{ width: `${speed}%` }}
-                    />
-
-                    {/* Zone markers */}
-                    <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-green-400"
-                        style={{ left: `${TARGET_MIN}%` }}
-                    />
-                    <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-green-400"
-                        style={{ left: `${TARGET_MAX}%` }}
-                    />
-                </div>
-                <div className="flex justify-between text-[10px] mt-1 text-slate-500">
-                    <span>0</span>
-                    <span className="text-green-500">Target Zone</span>
-                    <span>100</span>
-                </div>
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-center text-slate-400"
+                    >
+                        TAP HERE
+                    </motion.div>
+                )}
             </div>
 
             {/* Progress Bar */}
             <div className="w-full max-w-xs">
                 <div className="flex justify-between text-xs mb-1">
-                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Separation Progress</span>
+                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Sample Separation</span>
                     <span className={isApollo ? 'text-green-400' : 'text-white'}>{Math.round(progress)}%</span>
                 </div>
-                <div className={`h-3 rounded-full overflow-hidden ${isApollo ? 'bg-black border border-green-900' : 'bg-slate-800'}`}>
+                <div className={`h-4 rounded-full overflow-hidden ${isApollo ? 'bg-black border border-green-900' : 'bg-slate-800'}`}>
                     <motion.div
-                        className="h-full bg-gradient-to-r from-green-600 to-green-400"
+                        className={`h-full ${
+                            progress >= 80
+                                ? 'bg-gradient-to-r from-green-600 to-green-400'
+                                : isApollo
+                                    ? 'bg-gradient-to-r from-green-800 to-green-600'
+                                    : 'bg-gradient-to-r from-amber-600 to-amber-400'
+                        }`}
                         style={{ width: `${progress}%` }}
+                        animate={lastHit === 'perfect' ? { scale: [1, 1.02, 1] } : {}}
                     />
                 </div>
             </div>
 
-            {/* Boost Button */}
-            <button
-                onClick={handleBoost}
-                disabled={isComplete}
-                className={`
-                    w-full max-w-xs py-6 rounded-xl text-xl font-bold uppercase tracking-wider
-                    transition-all active:scale-95 flex items-center justify-center gap-3
-                    ${isComplete
-                        ? 'bg-green-600 text-white cursor-not-allowed'
-                        : isApollo
-                            ? 'bg-green-700 hover:bg-green-600 text-white border-2 border-green-500'
-                            : 'bg-amber-600 hover:bg-amber-500 text-white'
-                    }
-                `}
-            >
-                {isComplete ? (
-                    <>
-                        <Check className="w-6 h-6" />
-                        Complete!
-                    </>
-                ) : (
-                    <>
-                        <Zap className="w-6 h-6" />
-                        Boost!
-                    </>
+            {/* Timing Guide */}
+            <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-green-400" />
+                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Perfect</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-amber-400" />
+                    <span className={isApollo ? 'text-green-600' : 'text-slate-400'}>Good</span>
+                </div>
+            </div>
+
+            {/* Complete overlay */}
+            <AnimatePresence>
+                {isComplete && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-green-900/50 rounded-xl flex items-center justify-center"
+                    >
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', damping: 15 }}
+                            className="text-center"
+                        >
+                            <Check className="w-16 h-16 text-green-400 mx-auto mb-2" />
+                            <div className="text-green-400 font-bold text-xl">Sample Isolated!</div>
+                            <div className="text-green-600">Max combo: {combo}x</div>
+                        </motion.div>
+                    </motion.div>
                 )}
-            </button>
+            </AnimatePresence>
 
             {/* Educational Tip */}
             <div className={`text-xs text-center max-w-xs ${isApollo ? 'text-green-700' : 'text-slate-500'}`}>
-                <strong>Did you know?</strong> Centrifuges spin up to 30,000 RPM! The spinning force
-                separates heavy particles from light ones, helping scientists analyze moon rock samples.
+                <strong>Did you know?</strong> Centrifuges spin samples at thousands of RPM!
+                The spinning force separates heavy particles from light ones - that's how scientists
+                analyzed moon rock samples.
             </div>
         </div>
     );

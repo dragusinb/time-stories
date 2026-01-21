@@ -5,10 +5,11 @@ import { Navbar } from '@/components/Navbar';
 import { StoryCard } from '@/components/StoryCard';
 import { stories } from '@/lib/data';
 import TrophyRoom from '@/components/TrophyRoom';
-import { Trophy, BookOpen } from 'lucide-react';
+import Lab from '@/components/Lab';
+import { Trophy, BookOpen, FlaskConical } from 'lucide-react';
 
 export default function Home() {
-  const [viewMode, setViewMode] = useState<'stories' | 'trophies'>('stories');
+  const [viewMode, setViewMode] = useState<'stories' | 'trophies' | 'lab'>('stories');
 
   return (
     <main className="min-h-screen bg-slate-950 pb-20">
@@ -30,7 +31,14 @@ export default function Home() {
               className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'trophies' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'}`}
             >
               <Trophy size={18} />
-              <span>Trophy Room</span>
+              <span>Trophies</span>
+            </button>
+            <button
+              onClick={() => setViewMode('lab')}
+              className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'lab' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              <FlaskConical size={18} />
+              <span>Lab</span>
             </button>
           </div>
         </div>
@@ -52,9 +60,13 @@ export default function Home() {
               ))}
             </div>
           </>
-        ) : (
+        ) : viewMode === 'trophies' ? (
           <div className="h-[80vh] w-full border border-slate-700 rounded-lg overflow-hidden bg-slate-900 shadow-2xl">
             <TrophyRoom />
+          </div>
+        ) : (
+          <div className="h-[85vh] w-full border border-purple-700/50 rounded-lg overflow-hidden bg-slate-950 shadow-2xl overflow-y-auto">
+            <Lab />
           </div>
         )}
       </div>
