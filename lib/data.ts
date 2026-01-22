@@ -282,15 +282,15 @@ const s3 = 'story-3';
 // ACT 1-10: The Arrival & The Lever
 story3Acts.push(
     createAct(s3, 1, "Syracuse", "212 BC. You are Demetrios, a young student of mathematics from Alexandria. You have traveled to Syracuse to study under the greatest mind of the age: Archimedes. But you arrive to find a city under siege. Roman ships darken the harbor. The smell of salt and anxiety hangs in the air.", undefined, "/images/archimedes/act-1.png"),
-    createAct(s3, 2, "The Old Man", "You find him drawing circles in the sand near the harbor. Archimedes. The greatest mind of antiquity. He doesn't even look up as you approach. 'Do not disturb my circles,' he mutters.", {
+    createAct(s3, 2, "The Old Man", "You find him near the harbor, drawing circles in the sand with a stick. Archimedes of Syracuse—75 years old, kinsman to King Hiero II, and the greatest mathematician since Euclid. He has calculated pi, discovered the laws of buoyancy, and invented machines that seem like magic. He doesn't look up as you approach. 'Do not disturb my circles,' he mutters.", {
         id: 'mg-story-3-2',
         type: 'circle',
         question: "Draw a Perfect Circle",
         instructions: "Trace a perfect circle in the sand with your finger or mouse. Aim for >80% accuracy.",
         winningCondition: "Roundness > 80%"
     }, "/images/archimedes/act-2.png"),
-    createAct(s3, 3, "The Roman Fleet", "Ships approach the harbor. General Marcellus leads the Roman fleet. 'They are coming,' you say. Archimedes smiles, wiping the sand from his hands. 'Let them come. I have a surprise.'", undefined, "/images/archimedes/act-3.png"),
-    createAct(s3, 4, "The Iron Hand", "He points to a massive crane on the wall. 'The Claw,' he whispers. 'It will lift their ships like toys. But it needs a precise operator.' He looks at you.", {
+    createAct(s3, 3, "The Roman Fleet", "Ships approach the harbor—sixty quinqueremes carrying 30,000 men. General Marcus Claudius Marcellus commands the Roman assault, part of the Second Punic War. Rome seeks to punish Syracuse for allying with Carthage. 'They are coming,' you say. Archimedes smiles, wiping the sand from his hands. 'Let them come. I have prepared.'", undefined, "/images/archimedes/act-3.png"),
+    createAct(s3, 4, "The Iron Hand", "He points to a massive crane mounted on the seawall. The Romans will call it 'Manus Ferrea'—the Iron Hand. A compound lever system with bronze claws that can grip a ship's bow, lift it from the water, and drop it. The principle is simple: a small force at the end of a long arm becomes an enormous force at the short end. 'It needs a precise operator,' he says, looking at you.", {
         id: 'mg-story-3-4',
         type: 'defense',
         question: "Defend the Harbor",
@@ -301,7 +301,7 @@ story3Acts.push(
     createAct(s3, 6, "The Panic", "The Roman fleet retreats in confusion. They think the gods are fighting against them. Archimedes chuckles. 'Physics, my friend. Just physics.'", undefined, "/images/archimedes/act-6.png"),
     createAct(s3, 7, "The Workshop", "He takes you to his workshop. It's a chaotic mess of scrolls, models, and bronze gears. Star charts compete with mechanical diagrams. 'You studied at the Mouseion in Alexandria,' he observes, noting your accent. 'Good. Then you understand rigor.'", undefined, "/images/archimedes/act-7.png"),
     createAct(s3, 8, "The Lever", "'Give me a lever long enough and a fulcrum on which to place it, and I shall move the world.' He demonstrates with a bronze bar and a stone. A child could lift a boulder. Force multiplied by distance equals force multiplied by distance. It is elegant. It is true. It is the language of nature.", undefined, "/images/archimedes/act-8.png"),
-    createAct(s3, 9, "The King's Problem", "King Hiero II summons Archimedes. He suspects his new crown is not pure gold. 'Solve this without melting it,' the King commands. Archimedes looks troubled.", undefined, "/images/archimedes/act-9.png"),
+    createAct(s3, 9, "The King's Problem", "King Hiero II, who has ruled Syracuse for 54 years and made it the wealthiest Greek city in the west, summons Archimedes. He commissioned a golden crown to honor the gods, but suspects the goldsmith substituted silver. 'Prove it without damaging the crown,' the King commands. The problem seems impossible—until Archimedes takes a bath.", undefined, "/images/archimedes/act-9.png"),
     createAct(s3, 10, "The Bath", "Archimedes decides to take a bath to think. As he lowers himself in, the water rises. He stares at the spilling water. His eyes go wide.", {
         id: 'mg-story-3-10',
         type: 'displacement',
@@ -314,7 +314,7 @@ story3Acts.push(
 // ACT 11-20: The Siege & Buoyancy
 story3Acts.push(
     createAct(s3, 11, "Eureka!", "Water sloshes over the marble floor. Archimedes bursts from the water, running through the streets naked, eyes wide with a terrifying clarity. 'Eureka!' he screams. He doesn't see the city; he only sees the math.", undefined, "/images/archimedes/act-11.png"),
-    createAct(s3, 12, "Density", "He explains the principle breathlessly. 'Density is mass divided by volume.' Gold is dense. Silver is light. A mixed crown will betray itself by its volume. It is elegant. It is irrefutable.", undefined, "/images/archimedes/act-12.png"),
+    createAct(s3, 12, "Density", "He explains the principle breathlessly. Gold has a density of 19.3 grams per cubic centimeter—nearly twice that of silver at 10.5. A crown mixed with silver must be larger to weigh the same. When submerged, it displaces more water. The difference is measurable, mathematical, undeniable. This principle will one day be called Archimedes' Principle—the foundation of hydrostatics.", undefined, "/images/archimedes/act-12.png"),
     createAct(s3, 13, "The Test", "You set up the experiment in the palace. The King watches, his face unreadable. The goldsmith sweats. You lower the crown into the water. The level rises too high.", undefined, "/images/archimedes/act-13.png"),
     createAct(s3, 14, "The Result", "The King nods. 'Fake.' The goldsmith is dragged away to a fate you do not wish to witness. Archimedes has proven the power of the mind over matter.", undefined, "/images/archimedes/act-14.png"),
     createAct(s3, 15, "The Blockade", "The Romans return, stinging from their defeat. This time, they blockade the harbor. They will not fight; they will starve you out. The city walls become a prison.", undefined, "/images/archimedes/act-15.png"),
@@ -360,7 +360,7 @@ story3Acts.push(
 story3Acts.push(
     createAct(s3, 26, "The Standoff", "The Roman fleet lies in ruins. But Marcellus is stubborn. He blockades the land route. The siege drags on. It becomes a test of will.", undefined, "/images/archimedes/act-26.png"),
     createAct(s3, 27, "Thirst", "The cisterns run dry. The people look at the sea—water everywhere, but not a drop to drink. Archimedes points to the lower aquifers. 'The water is there. We just need to lift it.'", undefined, "/images/archimedes/act-27.png"),
-    createAct(s3, 28, "The Screw", "You construct the device. A massive wooden spiral inside a tube. You turn the crank. Water defies gravity, climbing the spiral. The 'Archimedes Screw'. Simple. Genius.", {
+    createAct(s3, 28, "The Screw", "You construct the device: a helical blade wound around a cylinder, tilted at 30 degrees. As the screw rotates, water is trapped between blade sections and carried upward. Archimedes may have invented this in Egypt to irrigate the Nile delta. Simple, requiring no valves or seals, it will still be used 2,200 years later in wastewater treatment plants.", {
         id: 'mg-story-3-28',
         type: 'sequence',
         theme: 'ancient',
@@ -391,7 +391,7 @@ story3Acts.push(
     createAct(s3, 37, "The Silence", "You arrive too late. Archimedes lies still, his blood mixing with the sand of his diagrams. The greatest mind of the ancient world, extinguished by a common soldier who never knew what he destroyed. General Marcellus, when he learns, will weep. He had ordered Archimedes spared.", undefined, "/images/archimedes/act-37.png"),
     createAct(s3, 38, "The Scrolls", "In the chaos, you gather what you can—scrolls, diagrams, half-finished proofs. The Romans are too busy looting gold to notice paper. You stuff them into a leather satchel. This is what matters now. Not the man. The ideas.", undefined, "/images/archimedes/act-38.png"),
     createAct(s3, 39, "The Escape", "You flee through the burning streets to the harbor. A fishing boat, abandoned in the panic. You row into the darkness as Syracuse falls. Behind you, flames reach toward the stars. Ahead, the sea is black and endless.", undefined, "/images/archimedes/act-39.png"),
-    createAct(s3, 40, "Alexandria", "Weeks later, you arrive at Alexandria. The Great Library welcomes you. Eratosthenes, the chief librarian, examines the scrolls with trembling hands. 'On Floating Bodies. On the Sphere and Cylinder. The Method.' His eyes fill with tears. 'He lives,' he whispers. 'In these, he lives forever.'", undefined, "/images/archimedes/act-40.png")
+    createAct(s3, 40, "Alexandria", "Weeks later, you arrive at Alexandria's Great Library—the largest collection of knowledge in the ancient world. Eratosthenes, the chief librarian who calculated the Earth's circumference, examines the scrolls with trembling hands. 'On Floating Bodies. On the Sphere and Cylinder. The Method.' Works that anticipated calculus by 1,800 years. 'His body is gone,' Eratosthenes whispers, 'but his mind will outlive Rome itself.'", undefined, "/images/archimedes/act-40.png")
 );
 
 export const stories: Story[] = [
