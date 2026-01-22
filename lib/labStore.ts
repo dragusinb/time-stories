@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useAdsStore } from './ads';
+import { useEventsStore } from './events';
 
 /**
  * Lab Store - Idle Game Metagame System
@@ -248,6 +249,12 @@ export const useLabStore = create<LabState>()(
                     total *= 2;
                 }
 
+                // Apply event production multiplier
+                const eventMultiplier = useEventsStore.getState().getCurrentProductionMultiplier();
+                if (eventMultiplier > 1) {
+                    total *= eventMultiplier;
+                }
+
                 return total;
             },
 
@@ -408,7 +415,14 @@ export const useLabStore = create<LabState>()(
                 // Base bonus of 100 energy, scales up to 500 at 100% stability
                 const baseBonus = 100;
                 const stabilityBonus = Math.floor((state.timelineStability / 100) * 400);
-                const totalBonus = (baseBonus + stabilityBonus) * state.permanentMultiplier;
+                let totalBonus = (baseBonus + stabilityBonus) * state.permanentMultiplier;
+
+                // Apply event lab bonus multiplier
+                const eventMultiplier = useEventsStore.getState().getCurrentLabBonusMultiplier();
+                if (eventMultiplier > 1) {
+                    totalBonus *= eventMultiplier;
+                }
+
                 return Math.floor(totalBonus);
             },
 

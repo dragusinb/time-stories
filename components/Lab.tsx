@@ -13,6 +13,69 @@ import { useAdsStore } from '@/lib/ads';
 import { gameHaptics } from '@/lib/haptics';
 import { track, trackPrestige, trackAdWatched } from '@/lib/analytics';
 import { sfx } from '@/lib/audio';
+import { useEventsStore, GameEvent } from '@/lib/events';
+
+// Event Banner Component
+const EventBanner: React.FC<{ event: GameEvent }> = ({ event }) => {
+    const endTime = event.endDate.getTime();
+    const [timeLeft, setTimeLeft] = useState('');
+
+    useEffect(() => {
+        const updateTime = () => {
+            const now = Date.now();
+            const diff = endTime - now;
+
+            if (diff <= 0) {
+                setTimeLeft('Ended');
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                setTimeLeft(`${days}d ${hours % 24}h left`);
+            } else {
+                setTimeLeft(`${hours}h ${minutes}m left`);
+            }
+        };
+
+        updateTime();
+        const interval = setInterval(updateTime, 60000); // Update every minute
+        return () => clearInterval(interval);
+    }, [endTime]);
+
+    const bgGradient = event.theme?.bgGradient || 'from-purple-900/50 to-indigo-900/50';
+    const primaryColor = event.theme?.primaryColor || '#8b5cf6';
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-3 rounded-xl bg-gradient-to-r ${bgGradient} border`}
+            style={{ borderColor: `${primaryColor}50` }}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <span className="text-2xl">{event.icon}</span>
+                    <div>
+                        <div className="font-bold text-white text-sm">{event.name}</div>
+                        <div className="text-xs text-slate-300">{event.description}</div>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <div className="text-xs text-slate-400">{timeLeft}</div>
+                    {event.bonuses.productionMultiplier && (
+                        <div className="text-sm font-bold" style={{ color: primaryColor }}>
+                            {event.bonuses.productionMultiplier}x Production
+                        </div>
+                    )}
+                </div>
+            </div>
+        </motion.div>
+    );
+};
 
 /**
  * Lab Component - Idle Game Metagame Hub
@@ -48,6 +111,10 @@ export const Lab: React.FC = () => {
     } = useLabStore();
 
     const { completedStories } = useStore();
+
+    // Events state
+    const activeEvents = useEventsStore((s) => s.getActiveEvents());
+    const eventProductionMultiplier = useEventsStore((s) => s.getCurrentProductionMultiplier());
 
     // Daily bonus state
     const [showDailyBonusClaimed, setShowDailyBonusClaimed] = useState(false);
@@ -121,8 +188,20 @@ export const Lab: React.FC = () => {
                             {isBoostActive && (
                                 <span className="text-cyan-400 font-bold ml-1">(2x Boosted!)</span>
                             )}
+                            {eventProductionMultiplier > 1 && !isBoostActive && (
+                                <span className="text-amber-400 font-bold ml-1">({eventProductionMultiplier}x Event!)</span>
+                            )}
                         </div>
                     </div>
+
+                    {/* Active Events Banner */}
+                    {activeEvents.length > 0 && (
+                        <div className="mb-4 space-y-2">
+                            {activeEvents.map((event) => (
+                                <EventBanner key={event.id} event={event} />
+                            ))}
+                        </div>
+                    )}
 
                     {/* Production Boost Banner */}
                     {isBoostActive ? (
