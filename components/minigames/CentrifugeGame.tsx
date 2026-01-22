@@ -29,12 +29,12 @@ export const CentrifugeGame: React.FC<CentrifugeGameProps> = ({ minigame, onComp
     const [lastHit, setLastHit] = useState<'perfect' | 'good' | 'miss' | null>(null);
     const [speed, setSpeed] = useState(30); // RPM visual
 
-    // Timing windows
-    const PERFECT_MIN = 0.85;
-    const PERFECT_MAX = 1.0;
-    const GOOD_MIN = 0.7;
-    const GOOD_MAX = 1.15;
-    const BEAT_DURATION = 1200; // ms per beat
+    // Timing windows (more forgiving)
+    const PERFECT_MIN = 0.75;
+    const PERFECT_MAX = 0.95;
+    const GOOD_MIN = 0.6;
+    const GOOD_MAX = 1.1;
+    const BEAT_DURATION = 1800; // ms per beat (slower, easier to track)
 
     const animationRef = useRef<number | null>(null);
     const beatStartRef = useRef(Date.now());

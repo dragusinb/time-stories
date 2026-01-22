@@ -147,6 +147,7 @@ export const Lab: React.FC = () => {
                                 temporalEnergy={temporalEnergy}
                                 buyUpgrade={buyUpgrade}
                                 getUpgradeCost={getUpgradeCost}
+                                unlockArtifact={useLabStore.getState().unlockArtifact}
                             />
                         </motion.div>
                     )}
@@ -199,6 +200,7 @@ interface ArtifactsTabProps {
     temporalEnergy: number;
     buyUpgrade: (upgradeId: string) => boolean;
     getUpgradeCost: (upgradeId: string) => number;
+    unlockArtifact: (artifactId: string) => void;
 }
 
 const ArtifactsTab: React.FC<ArtifactsTabProps> = ({
@@ -210,6 +212,7 @@ const ArtifactsTab: React.FC<ArtifactsTabProps> = ({
     temporalEnergy,
     buyUpgrade,
     getUpgradeCost,
+    unlockArtifact,
 }) => {
     return (
         <div className="space-y-4">
@@ -235,7 +238,16 @@ const ArtifactsTab: React.FC<ArtifactsTabProps> = ({
                                 }
                                 ${isSelected ? 'ring-2 ring-purple-500' : ''}
                             `}
-                            onClick={() => status.storyCompleted && setSelectedArtifact(isSelected ? null : artifact.id)}
+                            onClick={() => {
+                                if (!status.storyCompleted) return;
+                                if (!status.unlocked) {
+                                    // Activate the artifact!
+                                    unlockArtifact(artifact.id);
+                                } else {
+                                    // Toggle selection for upgrades
+                                    setSelectedArtifact(isSelected ? null : artifact.id);
+                                }
+                            }}
                             whileTap={status.storyCompleted ? { scale: 0.98 } : {}}
                         >
                             <div className="flex items-center gap-3">

@@ -41,7 +41,7 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
     useEffect(() => {
         if (isComplete) return;
 
-        const baseSpeed = 1.5 + (lockedReadings.length * 0.5); // Gets faster with each lock
+        const baseSpeed = 0.8 + (lockedReadings.length * 0.3); // Gets faster with each lock (but starts slow)
 
         const animate = () => {
             angleRef.current += directionRef.current * baseSpeed;
