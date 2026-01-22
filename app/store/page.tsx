@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useStore } from '@/lib/store';
 import { useBillingStore } from '@/lib/billing';
-import { Coins, Sparkles, RefreshCw, AlertCircle, PlayCircle } from 'lucide-react';
+import { Coins, Sparkles, RefreshCw, AlertCircle, PlayCircle, Users, TrendingUp, BookOpen } from 'lucide-react';
 import { WatchAdButton } from '@/components/WatchAdButton';
 import { useAdsStore } from '@/lib/ads';
 import { track, trackPurchaseCompleted, trackAdWatched } from '@/lib/analytics';
@@ -51,6 +51,7 @@ const fallbackPacks = [
         bonus: 1000,
         price: 99.99,
         color: 'from-emerald-700 to-emerald-600',
+        bestValue: true,
     },
 ];
 
@@ -184,13 +185,25 @@ function StoreContent() {
             <Navbar />
 
             <div className="container mx-auto px-4 py-12">
-                <div className="text-center mb-16">
+                <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-6xl font-serif font-bold text-slate-100 mb-4">
                         Coin <span className="text-amber-500">Store</span>
                     </h1>
                     <p className="text-slate-400 max-w-2xl mx-auto text-lg">
                         Purchase coins to unlock new acts and continue your journey through time.
                     </p>
+
+                    {/* Social Proof */}
+                    <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <Users className="w-4 h-4 text-amber-500" />
+                            <span>Join <strong className="text-white">10,000+</strong> time travelers</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <BookOpen className="w-4 h-4 text-purple-500" />
+                            <span><strong className="text-white">3</strong> epic stories to explore</span>
+                        </div>
+                    </div>
 
                     {/* Environment indicator */}
                     {!isNative && (
@@ -199,6 +212,27 @@ function StoreContent() {
                             Test Mode - Purchases are simulated
                         </div>
                     )}
+                </div>
+
+                {/* What Coins Unlock */}
+                <div className="max-w-2xl mx-auto mb-12 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <div className="text-center mb-3">
+                        <span className="text-sm text-slate-400">What can you unlock?</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div className="text-2xl font-bold text-amber-400">15</div>
+                            <div className="text-xs text-slate-500">coins per act</div>
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-purple-400">40+</div>
+                            <div className="text-xs text-slate-500">acts per story</div>
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-emerald-400">120+</div>
+                            <div className="text-xs text-slate-500">total acts</div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Error/Success Messages */}
@@ -214,49 +248,65 @@ function StoreContent() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {displayPacks.map((pack) => (
-                        <Card
-                            key={pack.id}
-                            className={`relative overflow-hidden border-slate-800 hover:border-amber-500/50 transition-all ${pack.popular ? 'scale-105 border-amber-500 shadow-amber-500/20 z-10' : ''}`}
-                        >
-                            {pack.popular && (
-                                <div className="absolute top-0 right-0 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
-                                    MOST POPULAR
-                                </div>
-                            )}
+                    {displayPacks.map((pack) => {
+                        const totalCoins = pack.coins + pack.bonus;
+                        const coinsPerDollar = (totalCoins / pack.price).toFixed(0);
+                        const actsUnlockable = Math.floor(totalCoins / 15);
 
-                            <div className={`h-32 -mx-6 -mt-6 mb-6 bg-gradient-to-br ${pack.color} flex items-center justify-center relative`}>
-                                <Coins className="w-16 h-16 text-white/20 absolute" />
-                                <div className="text-center z-10">
-                                    <div className="text-3xl font-bold text-white">{pack.coins}</div>
-                                    <div className="text-white/80 text-sm">Coins</div>
-                                </div>
-                            </div>
+                        return (
+                            <Card
+                                key={pack.id}
+                                className={`relative overflow-hidden border-slate-800 hover:border-amber-500/50 transition-all ${pack.popular ? 'scale-105 border-amber-500 shadow-amber-500/20 z-10' : ''} ${(pack as any).bestValue ? 'border-emerald-500' : ''}`}
+                            >
+                                {pack.popular && (
+                                    <div className="absolute top-0 right-0 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
+                                        MOST POPULAR
+                                    </div>
+                                )}
+                                {(pack as any).bestValue && !pack.popular && (
+                                    <div className="absolute top-0 right-0 bg-emerald-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
+                                        BEST VALUE
+                                    </div>
+                                )}
 
-                            <h3 className="text-xl font-bold text-white mb-2">{pack.name}</h3>
-
-                            {pack.bonus > 0 && (
-                                <div className="flex items-center gap-1 text-emerald-400 text-sm mb-4 font-bold">
-                                    <Sparkles className="w-4 h-4" />
-                                    +{pack.bonus} Bonus Coins
+                                <div className={`h-32 -mx-6 -mt-6 mb-6 bg-gradient-to-br ${pack.color} flex items-center justify-center relative`}>
+                                    <Coins className="w-16 h-16 text-white/20 absolute" />
+                                    <div className="text-center z-10">
+                                        <div className="text-3xl font-bold text-white">{totalCoins}</div>
+                                        <div className="text-white/80 text-sm">Coins</div>
+                                    </div>
                                 </div>
-                            )}
 
-                            <div className="mt-auto">
-                                <div className="text-2xl font-bold text-white mb-4">
-                                    {pack.priceString}
+                                <h3 className="text-xl font-bold text-white mb-2">{pack.name}</h3>
+
+                                {pack.bonus > 0 && (
+                                    <div className="flex items-center gap-1 text-emerald-400 text-sm mb-2 font-bold">
+                                        <Sparkles className="w-4 h-4" />
+                                        +{pack.bonus} Bonus Coins
+                                    </div>
+                                )}
+
+                                {/* Value indicator */}
+                                <div className="text-xs text-slate-500 mb-4">
+                                    <span className="text-slate-400">{coinsPerDollar}</span> coins/$  ·  Unlocks <span className="text-slate-400">{actsUnlockable}</span> acts
                                 </div>
-                                <Button
-                                    className="w-full"
-                                    variant={pack.popular ? 'primary' : 'secondary'}
-                                    onClick={() => handlePurchase(pack.id, pack.coins + pack.bonus, pack.rcPackage)}
-                                    disabled={purchasing !== null}
-                                >
-                                    {purchasing === pack.id ? 'Processing...' : 'Buy Now'}
-                                </Button>
-                            </div>
-                        </Card>
-                    ))}
+
+                                <div className="mt-auto">
+                                    <div className="text-2xl font-bold text-white mb-4">
+                                        {pack.priceString}
+                                    </div>
+                                    <Button
+                                        className="w-full"
+                                        variant={pack.popular ? 'primary' : 'secondary'}
+                                        onClick={() => handlePurchase(pack.id, totalCoins, pack.rcPackage)}
+                                        disabled={purchasing !== null}
+                                    >
+                                        {purchasing === pack.id ? 'Processing...' : 'Buy Now'}
+                                    </Button>
+                                </div>
+                            </Card>
+                        );
+                    })}
                 </div>
 
                 {/* Free Coins - Watch Ad Section */}
