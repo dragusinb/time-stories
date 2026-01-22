@@ -1,4 +1,4 @@
-export type MinigameType = 'quiz' | 'memory' | 'cipher' | 'sequence' | 'microscope' | 'mixing' | 'timeline' | 'claw' | 'defense' | 'scale' | 'mirror' | 'catapult' | 'circle' | 'displacement' | 'gears' | 'tangram' | 'silo' | 'lens' | 'symbol' | 'debate' | 'ritual' | 'constellation' | 'chemistry' | 'diagnosis' | 'triage' | 'sanitation' | 'ratcatcher' | 'centrifuge' | 'grinding';
+export type MinigameType = 'quiz' | 'memory' | 'cipher' | 'sequence' | 'microscope' | 'mixing' | 'timeline' | 'claw' | 'defense' | 'scale' | 'mirror' | 'catapult' | 'circle' | 'displacement' | 'gears' | 'tangram' | 'silo' | 'lens' | 'symbol' | 'debate' | 'ritual' | 'constellation' | 'chemistry' | 'diagnosis' | 'triage' | 'sanitation' | 'ratcatcher' | 'centrifuge' | 'grinding' | 'sample' | 'alignment' | 'checklist';
 
 export interface Minigame {
     id: string;

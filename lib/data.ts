@@ -62,12 +62,12 @@ story1Acts.push(
 // --- PHASE 2: SURFACE OPERATIONS (Acts 11-20) ---
 story1Acts.push(
     createAct(s1, 11, "One Small Step", "You stand on the porch. The ladder is just a few rungs, but it spans a billion years of evolution. You drop the last three feet. The dust puffs silently. The world watches, but you are alone. 'That's one small step for man...'", undefined, "/images/apollo/act-11.png"),
-    createAct(s1, 12, "Contingency Sample", "First rule: get a sample. If the engine explodes now, at least we bring something home. You scoop the regolith blindly. It's like wet sand, yet dry as bone. The bag seals with a satisfying snap.", {
+    createAct(s1, 12, "Contingency Sample", "First rule: get a sample. If the engine explodes now, at least we bring something home. You grab the scoop and contingency sample bags. Each sample must be carefully collected and sealed to preserve the lunar vacuum. The bag seals with a satisfying snap.", {
         id: 'mg-story-1-12',
-        type: 'centrifuge',
-        question: "Analyze the Regolith Sample.",
-        instructions: "Hold SPIN to separate isotopes. Keep RPM in the green zone.",
-        winningCondition: "Sample Isolated"
+        type: 'sample',
+        question: "Collect Lunar Samples",
+        instructions: "Gather rock and soil samples, then seal the container for return to Earth.",
+        winningCondition: "Samples Secured"
     }, "/images/apollo/act-12.png"),
     createAct(s1, 13, "Magnificent Desolation", "Aldrin joins you. You look out at the horizon. It's too close. The curvature is wrong. The colors are absolute—black sky, white ground. 'Magnificent desolation,' Buzz says. It is beautiful because it is dead.", undefined, "/images/apollo/act-13.png"),
     createAct(s1, 14, "Mobility", "Walking is impossible. You learn to skip, to hop like a kangaroo in slow motion. The 1/6th gravity is a seductive mistress; she lets you fly, but momentum is still a cruel master. You stumble, heart racing. A tear in the suit means death.", undefined, "/images/apollo/act-14.png"),
@@ -90,12 +90,12 @@ story1Acts.push(
         instructions: "Adjust the leveling legs until the bubble is centered. Account for lunar dust settling.",
         winningCondition: "Level < 0.1 degrees"
     }, "/images/apollo/act-19.png"),
-    createAct(s1, 20, "Laser Ranging", "The Retro-Reflector (LRRR). A grid of 100 prisms. You aim it towards Earth, invisible in the sky. If you get this right, astronomers will shoot lasers at it for decades, measuring the moon's distance to the millimeter.", {
+    createAct(s1, 20, "Laser Ranging", "The Lunar Ranging Retroreflector. A grid of 100 corner-cube prisms that will reflect laser beams back to Earth. You position it on the surface, adjusting the tilt until it points toward home. Scientists will bounce lasers off this for the next 50 years.", {
         id: 'mg-story-1-20',
-        type: 'lens',
-        question: "Align the Retro-Reflector Array.",
-        instructions: "Clean the dust off the prism faces. Align the optical axis with the Earth vector.",
-        winningCondition: "Signal Path Clear"
+        type: 'alignment',
+        question: "Position the Retroreflector",
+        instructions: "Adjust the reflector's tilt until Earth is centered in the alignment scope.",
+        winningCondition: "Reflector Aligned"
     }, "/images/apollo/act-20.png")
 );
 
@@ -140,15 +140,13 @@ story1Acts.push(
     createAct(s1, 33, "TEI Burn", "Trans-Earth Injection. The big engine fires on the far side of the moon. This is the push home. If it fails, you die here. It burns true.", undefined, "/images/apollo/act-33.png"),
     createAct(s1, 34, "Earthrise", "You come around the moon one last time. You see Earth rising, a blue marble in the void. It looks fragile. You realize you haven't just explored the moon; you've discovered the Earth.", undefined, "/images/apollo/act-34.png"),
     createAct(s1, 35, "Coasting", "The trip back is quiet. You shave. You stow the gear. The spacecraft is spinning slowly in the BBQ roll. You are three men in a can, falling towards home.", undefined, "/images/apollo/act-35.png"),
-    createAct(s1, 36, "Re-entry Prep", "You approach Earth. Speed: 25,000 mph. You jettison the Service Module. The Command Module turns its heat shield towards the atmosphere.", {
+    createAct(s1, 36, "Re-entry Prep", "You approach Earth at 25,000 mph. You jettison the Service Module—goodbye, faithful companion. The Command Module rotates, pointing its heat shield toward the atmosphere. Time for the final checklist.", {
         id: 'mg-story-1-36',
-        type: 'cipher',
+        type: 'checklist',
         theme: 'apollo',
-        question: "Verify Re-entry Checklist.",
-        instructions: "Confirm Heat Shield, Parachutes, and Attitude inputs.",
-        winningCondition: "All systems GO.",
-        encrypted: "HEAT-PARA-ATT",
-        decrypted: "HEAT SHIELD GREEN"
+        question: "Verify Re-entry Systems",
+        instructions: "Confirm all systems are GO for atmospheric re-entry.",
+        winningCondition: "All Systems GO"
     }, "/images/apollo/act-36.png"),
     createAct(s1, 37, "Blackout", "You hit the atmosphere. Fire surrounds the windows. Ionized plasma blocks all radio signals. You are alone in the fireball. Gravity returns, crushing you into your couch.", undefined, "/images/apollo/act-37.png"),
     createAct(s1, 38, "Drogues Deployed", "The radio crackles. 'We hear you!' The drogue chutes pop out, jerking the capsule violent. The spin stops. You are falling through the clouds.", undefined, "/images/apollo/act-38.png"),

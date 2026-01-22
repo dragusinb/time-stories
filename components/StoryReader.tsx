@@ -38,6 +38,9 @@ import { QuizGame } from './minigames/QuizGame';
 import { ParticleOverlay } from './ui/ParticleOverlay';
 import { CentrifugeGame } from './minigames/CentrifugeGame';
 import { GrindingGame } from './minigames/GrindingGame';
+import SampleCollectionGame from './minigames/SampleCollectionGame';
+import AlignmentGame from './minigames/AlignmentGame';
+import ChecklistGame from './minigames/ChecklistGame';
 
 interface StoryReaderProps {
     story: Story;
@@ -589,6 +592,18 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
 
     if (minigame.type === 'grinding') {
         return <GrindingGame minigame={minigame} onComplete={onComplete} />;
+    }
+
+    if (minigame.type === 'sample') {
+        return <SampleCollectionGame minigame={minigame} onComplete={onComplete} theme={theme} />;
+    }
+
+    if (minigame.type === 'alignment') {
+        return <AlignmentGame minigame={minigame} onComplete={onComplete} theme={theme} />;
+    }
+
+    if (minigame.type === 'checklist') {
+        return <ChecklistGame minigame={minigame} onComplete={onComplete} theme={theme} />;
     }
 
     // Default to Quiz
