@@ -281,7 +281,7 @@ const s3 = 'story-3';
 
 // ACT 1-10: The Arrival & The Lever
 story3Acts.push(
-    createAct(s3, 1, "Syracuse", "You step out of the portal into the blinding Mediterranean sun. The year is 212 BC. Syracuse. A city under siege. The smell of salt and anxiety hangs in the air.", undefined, "/images/archimedes/act-1.png"),
+    createAct(s3, 1, "Syracuse", "212 BC. You are Demetrios, a young student of mathematics from Alexandria. You have traveled to Syracuse to study under the greatest mind of the age: Archimedes. But you arrive to find a city under siege. Roman ships darken the harbor. The smell of salt and anxiety hangs in the air.", undefined, "/images/archimedes/act-1.png"),
     createAct(s3, 2, "The Old Man", "You find him drawing circles in the sand near the harbor. Archimedes. The greatest mind of antiquity. He doesn't even look up as you approach. 'Do not disturb my circles,' he mutters.", {
         id: 'mg-story-3-2',
         type: 'circle',
@@ -299,8 +299,8 @@ story3Acts.push(
     }, "/images/archimedes/act-4.png"),
     createAct(s3, 5, "The Capsize", "The claw descends, hooking the Roman galley. With a groan of timber, the ship is lifted out of the water. Men scream. The ship flips. The Romans retreat in terror.", undefined, "/images/archimedes/act-5.png"),
     createAct(s3, 6, "The Panic", "The Roman fleet retreats in confusion. They think the gods are fighting against them. Archimedes chuckles. 'Physics, my friend. Just physics.'", undefined, "/images/archimedes/act-6.png"),
-    createAct(s3, 7, "The Workshop", "He takes you to his workshop. It's a chaotic mess of scrolls, models, and bronze gears. 'You are not from here,' he states. It's not a question.", undefined, "/images/archimedes/act-7.png"),
-    createAct(s3, 8, "The Lever", "'Give me a place to stand, and I will move the earth.' He demonstrates the law of the lever. You realize he understands the fundamental laws of the universe better than most modern engineers.", undefined, "/images/archimedes/act-8.png"),
+    createAct(s3, 7, "The Workshop", "He takes you to his workshop. It's a chaotic mess of scrolls, models, and bronze gears. Star charts compete with mechanical diagrams. 'You studied at the Mouseion in Alexandria,' he observes, noting your accent. 'Good. Then you understand rigor.'", undefined, "/images/archimedes/act-7.png"),
+    createAct(s3, 8, "The Lever", "'Give me a lever long enough and a fulcrum on which to place it, and I shall move the world.' He demonstrates with a bronze bar and a stone. A child could lift a boulder. Force multiplied by distance equals force multiplied by distance. It is elegant. It is true. It is the language of nature.", undefined, "/images/archimedes/act-8.png"),
     createAct(s3, 9, "The King's Problem", "King Hiero II summons Archimedes. He suspects his new crown is not pure gold. 'Solve this without melting it,' the King commands. Archimedes looks troubled.", undefined, "/images/archimedes/act-9.png"),
     createAct(s3, 10, "The Bath", "Archimedes decides to take a bath to think. As he lowers himself in, the water rises. He stares at the spilling water. His eyes go wide.", {
         id: 'mg-story-3-10',
@@ -385,32 +385,13 @@ story3Acts.push(
     createAct(s3, 35, "The Intruder", "The door splinters. A Roman soldier stands there, sword dripping. He sees an old man. He does not see a genius. He sees a target.", undefined, "/images/archimedes/act-35.png")
 );
 
-// ACT 36-50: The Legacy & Extraction
+// ACT 36-40: The Death & The Legacy
 story3Acts.push(
-    createAct(s3, 36, "Do Not Disturb", "Archimedes looks up, annoyed. 'Do not disturb my circles!' he barks. The soldier raises his sword. You have a split second to change history.", undefined, "/images/archimedes/act-36.png"),
-    createAct(s3, 37, "The Intervention", "You tackle the soldier. The sword clatters. 'Run!' you scream. Archimedes grabs his scrolls. He is confused, but he runs.", undefined, "/images/archimedes/act-37.png"),
-    createAct(s3, 38, "The Rooftops", "You flee across the rooftops. The city is burning. The Great Library of the West is falling. You must save the mind, if not the body.", undefined, "/images/archimedes/act-38.png"),
-    createAct(s3, 39, "The Harbor", "The harbor is blocked. You find a small fishing boat. The Roman fleet is distracted by the looting. Just one chance.", undefined, "/images/archimedes/act-39.png"),
-    createAct(s3, 40, "The Encryption", "You need to lock the scroll case. If the Romans find it, they destroy it. You set a cipher only a scholar would know.", {
-        id: 'mg-story-3-40',
-        type: 'cipher',
-        theme: 'ancient',
-        question: "Set the Cylinder Seal Combination.",
-        instructions: "Decode the sequence: Alpha, Delta, Pi, Omega.",
-        winningCondition: "Lock Secured",
-        encrypted: "ADPO",
-        decrypted: "ADPO"
-    }, "/images/archimedes/act-40.png"),
-    createAct(s3, 41, "The Escape", "You row out into the dark. Syracuse burns. Archimedes watches his home die. A single tear tracks through the dust on his face.", undefined, "/images/archimedes/act-41.png"),
-    createAct(s3, 42, "Alexandria", "Weeks later. Alexandria. The Great Library. Eratosthenes meets you at the docks. He embraces Archimedes like a brother returned from the dead.", undefined, "/images/archimedes/act-42.png"),
-    createAct(s3, 43, "The Deposit", "Archimedes unravels his scrolls. Calculus. Hydrostatics. Physics. He begins to teach. The timeline ripples.", undefined, "/images/archimedes/act-43.png"),
-    createAct(s3, 44, "The Acceleration", "With Archimedes alive, the Industrial Revolution begins in 200 BC. Steam engines power ships. The Romans reach the moon in 400 AD.", undefined, "/images/archimedes/act-44.png"),
-    createAct(s3, 45, "The Paradox", "The simulation shudders. The sky turns static. 'Paradox Detected,' the system warns. You pushed it too far.", undefined, "/images/archimedes/act-45.png"),
-    createAct(s3, 46, "The Steam Engine", "You watch a steam locomotive chug past the Parthenon. It is beautiful, but it is wrong. The code is unraveling.", undefined, "/images/archimedes/act-46.png"),
-    createAct(s3, 47, "Stabilization", "You must stabilize the timeline. You convince Archimedes to hide his most advanced work in the Secret Archives. 'For a future age,' you say.", undefined, "/images/archimedes/act-47.png"),
-    createAct(s3, 48, "The Farewell", "He looks at you. He knows. 'You are the traveler,' he says. 'Thank you for the extra time.' He shakes your hand. A connection across millennia.", undefined, "/images/archimedes/act-48.png"),
-    createAct(s3, 49, "Extraction", "The white light returns. Mission Complete. Entity Saved. Timeline: Divergent but Stable.", undefined, "/images/archimedes/act-49.png"),
-    createAct(s3, 50, "Debrief", "Subject: Agent. Performance: Legendary. You saved the mind that moved the world. Welcome home.", undefined, "/images/archimedes/act-50.png")
+    createAct(s3, 36, "Do Not Disturb", "Archimedes looks up, annoyed at the interruption. 'Noli turbare circulos meos!' he barks—Do not disturb my circles! The soldier does not speak Greek. He does not care. He sees only an old man who refuses to move. The sword falls.", undefined, "/images/archimedes/act-36.png"),
+    createAct(s3, 37, "The Silence", "You arrive too late. Archimedes lies still, his blood mixing with the sand of his diagrams. The greatest mind of the ancient world, extinguished by a common soldier who never knew what he destroyed. General Marcellus, when he learns, will weep. He had ordered Archimedes spared.", undefined, "/images/archimedes/act-37.png"),
+    createAct(s3, 38, "The Scrolls", "In the chaos, you gather what you can—scrolls, diagrams, half-finished proofs. The Romans are too busy looting gold to notice paper. You stuff them into a leather satchel. This is what matters now. Not the man. The ideas.", undefined, "/images/archimedes/act-38.png"),
+    createAct(s3, 39, "The Escape", "You flee through the burning streets to the harbor. A fishing boat, abandoned in the panic. You row into the darkness as Syracuse falls. Behind you, flames reach toward the stars. Ahead, the sea is black and endless.", undefined, "/images/archimedes/act-39.png"),
+    createAct(s3, 40, "Alexandria", "Weeks later, you arrive at Alexandria. The Great Library welcomes you. Eratosthenes, the chief librarian, examines the scrolls with trembling hands. 'On Floating Bodies. On the Sphere and Cylinder. The Method.' His eyes fill with tears. 'He lives,' he whispers. 'In these, he lives forever.'", undefined, "/images/archimedes/act-40.png")
 );
 
 export const stories: Story[] = [
@@ -436,12 +417,12 @@ export const stories: Story[] = [
     },
     {
         id: 'story-3',
-        title: "Archimedes' Sidekick",
-        description: "Syracuse, 212 BC. Join the legendary mathematician Archimedes. Defend the city from the Romans using the power of physics and geometry.",
+        title: "The Student of Archimedes",
+        description: "Syracuse, 212 BC. As a young scholar from Alexandria, you study under the legendary Archimedes. Defend the city from Rome using physics and geometry—and preserve his legacy for the ages.",
         coverImage: '/images/covers/archimedes.png',
         period: 'Antiquity',
         location: 'Syracuse',
-        totalActs: 50,
+        totalActs: 40,
         acts: story3Acts,
     },
 ];
