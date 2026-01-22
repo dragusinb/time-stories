@@ -5,7 +5,10 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useStore } from '@/lib/store';
 import { useBillingStore } from '@/lib/billing';
-import { Coins, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import { Coins, Sparkles, RefreshCw, AlertCircle, PlayCircle } from 'lucide-react';
+import { WatchAdButton } from '@/components/WatchAdButton';
+import { useAdsStore } from '@/lib/ads';
+import { track, trackPurchaseCompleted, trackAdWatched } from '@/lib/analytics';
 import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
@@ -96,6 +99,9 @@ function StoreContent() {
         setPurchasing(packId);
         setError(null);
 
+        // Track purchase started
+        track('purchase_started', { package_id: packId, coins_amount: coins });
+
         try {
             if (isNative && rcPackage) {
                 // Real purchase via RevenueCat
@@ -105,6 +111,7 @@ function StoreContent() {
                     // Add coins after successful purchase
                     addCoins(coins);
                     setSuccessMessage(`Successfully purchased ${coins} coins!`);
+                    trackPurchaseCompleted(packId, rcPackage?.product?.price || 0, coins);
 
                     if (returnUrl) {
                         setTimeout(() => router.push(returnUrl), 1500);
@@ -120,6 +127,7 @@ function StoreContent() {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 addCoins(coins);
                 setSuccessMessage(`[Test Mode] Added ${coins} coins!`);
+                trackPurchaseCompleted(packId, 0, coins);
 
                 if (returnUrl) {
                     setTimeout(() => router.push(returnUrl), 1500);
@@ -249,6 +257,23 @@ function StoreContent() {
                             </div>
                         </Card>
                     ))}
+                </div>
+
+                {/* Free Coins - Watch Ad Section */}
+                <div className="mt-12 max-w-md mx-auto">
+                    <div className="text-center mb-4">
+                        <h2 className="text-2xl font-bold text-white mb-2">Free Coins</h2>
+                        <p className="text-slate-400 text-sm">Watch a short video to earn bonus coins!</p>
+                    </div>
+
+                    <WatchAdButton
+                        rewardType="bonus_coins"
+                        variant="banner"
+                        onRewardEarned={(amount) => {
+                            setSuccessMessage(`You earned ${amount} bonus coins!`);
+                            trackAdWatched('rewarded', 'bonus_coins');
+                        }}
+                    />
                 </div>
 
                 {/* Restore Purchases Button (Required by Apple) */}

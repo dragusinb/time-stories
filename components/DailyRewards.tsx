@@ -16,6 +16,8 @@ import {
     X,
     Shield,
 } from 'lucide-react';
+import { trackDailyRewardClaimed } from '@/lib/analytics';
+import { sfx } from '@/lib/audio';
 
 interface DailyRewardsModalProps {
     isOpen: boolean;
@@ -50,6 +52,8 @@ const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({ isOpen, onClose }
             setClaimedAmount(result.coins);
             setShowClaimed(true);
             await gameHaptics.coinsEarned();
+            sfx.reward();
+            trackDailyRewardClaimed(currentStreak, result.coins);
 
             // Auto close after animation
             setTimeout(() => {

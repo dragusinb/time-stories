@@ -9,6 +9,7 @@ import { DailyRewardsBadge } from './DailyRewards';
 import { AchievementsBadge } from './Achievements';
 import DailyRewardsModal from './DailyRewards';
 import AchievementsModal from './Achievements';
+import { AudioSettings } from './AudioSettings';
 
 export function Navbar() {
     const coins = useStore((state) => state.coins);
@@ -35,6 +36,7 @@ export function Navbar() {
                         </Link>
 
                         <div className="flex items-center gap-2">
+                            <AudioSettings compact />
                             <DailyRewardsBadge onClick={() => setShowDailyRewards(true)} />
                             <AchievementsBadge onClick={() => setShowAchievements(true)} />
                         </div>

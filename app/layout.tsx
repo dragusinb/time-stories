@@ -38,6 +38,8 @@ export const metadata: Metadata = {
 };
 
 import { BillingProvider } from '@/components/BillingProvider';
+import { AdsProvider } from '@/components/AdsProvider';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function RootLayout({
@@ -52,9 +54,13 @@ export default function RootLayout({
       </head>
       <body className={`${outfit.variable} ${cinzel.variable} antialiased`}>
         <ErrorBoundary>
-          <BillingProvider>
-            {children}
-          </BillingProvider>
+          <AnalyticsProvider>
+            <BillingProvider>
+              <AdsProvider>
+                {children}
+              </AdsProvider>
+            </BillingProvider>
+          </AnalyticsProvider>
         </ErrorBoundary>
       </body>
     </html>

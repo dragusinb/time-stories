@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useAdsStore } from './ads';
 
 /**
  * Lab Store - Idle Game Metagame System
@@ -171,6 +172,9 @@ interface LabState {
     prestigeCount: number;
     permanentMultiplier: number; // From shards
 
+    // Daily Bonus
+    lastDailyBonusDate: string | null;
+
     // Timing
     lastUpdate: number;
 
@@ -185,6 +189,9 @@ interface LabState {
     getTotalProduction: () => number;
     getArtifactProduction: (artifactId: string) => number;
     getUpgradeCost: (upgradeId: string) => number;
+    canClaimDailyBonus: () => boolean;
+    getDailyBonusAmount: () => number;
+    claimDailyBonus: () => number;
 }
 
 export const useLabStore = create<LabState>()(
@@ -200,6 +207,7 @@ export const useLabStore = create<LabState>()(
             upgradeLevels: {},
             prestigeCount: 0,
             permanentMultiplier: 1,
+            lastDailyBonusDate: null,
             lastUpdate: Date.now(),
 
             // Calculate production for a single artifact
@@ -233,6 +241,13 @@ export const useLabStore = create<LabState>()(
                 for (const artifact of ARTIFACTS) {
                     total += state.getArtifactProduction(artifact.id);
                 }
+
+                // Apply 2x production boost from ads if active
+                const hasBoost = useAdsStore.getState().hasProductionBoost();
+                if (hasBoost) {
+                    total *= 2;
+                }
+
                 return total;
             },
 
@@ -378,6 +393,40 @@ export const useLabStore = create<LabState>()(
                 if (state.temporalShards < amount) return false;
                 set({ temporalShards: state.temporalShards - amount });
                 return true;
+            },
+
+            // Daily Bonus - check if can claim
+            canClaimDailyBonus: () => {
+                const state = get();
+                const today = new Date().toISOString().split('T')[0];
+                return state.lastDailyBonusDate !== today;
+            },
+
+            // Daily Bonus - calculate amount (scales with timeline stability)
+            getDailyBonusAmount: () => {
+                const state = get();
+                // Base bonus of 100 energy, scales up to 500 at 100% stability
+                const baseBonus = 100;
+                const stabilityBonus = Math.floor((state.timelineStability / 100) * 400);
+                const totalBonus = (baseBonus + stabilityBonus) * state.permanentMultiplier;
+                return Math.floor(totalBonus);
+            },
+
+            // Daily Bonus - claim it
+            claimDailyBonus: () => {
+                const state = get();
+                if (!state.canClaimDailyBonus()) return 0;
+
+                const bonusAmount = state.getDailyBonusAmount();
+                const today = new Date().toISOString().split('T')[0];
+
+                set({
+                    temporalEnergy: state.temporalEnergy + bonusAmount,
+                    totalEnergyProduced: state.totalEnergyProduced + bonusAmount,
+                    lastDailyBonusDate: today,
+                });
+
+                return bonusAmount;
             },
         }),
         {

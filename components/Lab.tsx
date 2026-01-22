@@ -6,8 +6,13 @@ import { useLabStore, ARTIFACTS, UPGRADES, ANOMALIES, formatEnergy } from '@/lib
 import { useStore } from '@/lib/store';
 import {
     Zap, Clock, Shield, TrendingUp, ChevronRight,
-    Lock, Sparkles, RotateCcw, Award
+    Lock, Sparkles, RotateCcw, Award, PlayCircle, Gift, Check
 } from 'lucide-react';
+import { WatchAdButton } from '@/components/WatchAdButton';
+import { useAdsStore } from '@/lib/ads';
+import { gameHaptics } from '@/lib/haptics';
+import { track, trackPrestige, trackAdWatched } from '@/lib/analytics';
+import { sfx } from '@/lib/audio';
 
 /**
  * Lab Component - Idle Game Metagame Hub
@@ -37,9 +42,36 @@ export const Lab: React.FC = () => {
         getTotalProduction,
         getArtifactProduction,
         getUpgradeCost,
+        canClaimDailyBonus,
+        getDailyBonusAmount,
+        claimDailyBonus,
     } = useLabStore();
 
     const { completedStories } = useStore();
+
+    // Daily bonus state
+    const [showDailyBonusClaimed, setShowDailyBonusClaimed] = useState(false);
+    const [claimedBonusAmount, setClaimedBonusAmount] = useState(0);
+    const canClaimBonus = canClaimDailyBonus();
+    const dailyBonusAmount = getDailyBonusAmount();
+
+    const handleClaimDailyBonus = async () => {
+        const amount = claimDailyBonus();
+        if (amount > 0) {
+            setClaimedBonusAmount(amount);
+            setShowDailyBonusClaimed(true);
+            await gameHaptics.coinsEarned();
+            sfx.reward();
+            track('daily_bonus_claimed', { energy_amount: amount, timeline_stability: timelineStability });
+            setTimeout(() => setShowDailyBonusClaimed(false), 2000);
+        }
+    };
+
+    // Get ads state for production boost
+    const { hasProductionBoost, productionBoostUntil, canWatchAd } = useAdsStore();
+    const isBoostActive = hasProductionBoost();
+    const boostTimeRemaining = productionBoostUntil ? Math.max(0, productionBoostUntil - Date.now()) : 0;
+    const boostMinutesRemaining = Math.ceil(boostTimeRemaining / 60000);
 
     // Tick the production
     useEffect(() => {
@@ -86,8 +118,86 @@ export const Lab: React.FC = () => {
                         <div className="text-sm text-slate-500 flex items-center justify-center gap-1">
                             <TrendingUp className="w-3 h-3" />
                             +{formatEnergy(totalProduction)}/s
+                            {isBoostActive && (
+                                <span className="text-cyan-400 font-bold ml-1">(2x Boosted!)</span>
+                            )}
                         </div>
                     </div>
+
+                    {/* Production Boost Banner */}
+                    {isBoostActive ? (
+                        <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-cyan-900/50 to-blue-900/50 border border-cyan-600/50">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-cyan-400" />
+                                    <span className="text-cyan-300 font-medium">2x Production Active</span>
+                                </div>
+                                <span className="text-cyan-400 text-sm font-mono">
+                                    {boostMinutesRemaining}m remaining
+                                </span>
+                            </div>
+                        </div>
+                    ) : canWatchAd() ? (
+                        <div className="mb-4">
+                            <WatchAdButton
+                                rewardType="production_boost"
+                                variant="banner"
+                                onRewardEarned={() => {
+                                    // Boost is automatically applied by the ads store
+                                    trackAdWatched('rewarded', 'production_boost');
+                                }}
+                            />
+                        </div>
+                    ) : null}
+
+                    {/* Daily Bonus Card */}
+                    <AnimatePresence mode="wait">
+                        {showDailyBonusClaimed ? (
+                            <motion.div
+                                key="claimed"
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="mb-4 p-4 rounded-xl bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/50 text-center"
+                            >
+                                <div className="flex items-center justify-center gap-2 text-green-400 font-bold">
+                                    <Check className="w-5 h-5" />
+                                    +{formatEnergy(claimedBonusAmount)} Energy Claimed!
+                                </div>
+                            </motion.div>
+                        ) : canClaimBonus ? (
+                            <motion.button
+                                key="claim"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                onClick={handleClaimDailyBonus}
+                                className="w-full mb-4 p-4 rounded-xl bg-gradient-to-r from-amber-900/50 to-orange-900/50 border-2 border-amber-500/50 hover:border-amber-400 transition-all"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg bg-amber-500/30 flex items-center justify-center">
+                                            <Gift className="w-5 h-5 text-amber-400" />
+                                        </div>
+                                        <div className="text-left">
+                                            <div className="font-bold text-amber-300">Daily Lab Bonus</div>
+                                            <div className="text-xs text-amber-400/70">Tap to collect!</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-lg font-bold text-amber-300">
+                                            +{formatEnergy(dailyBonusAmount)}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">
+                                            {timelineStability > 0 && `(${Math.floor(timelineStability)}% bonus)`}
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.button>
+                        ) : null}
+                    </AnimatePresence>
 
                     {/* Timeline Stability Bar */}
                     <div className="mb-4">
@@ -451,6 +561,14 @@ const PrestigeTab: React.FC<PrestigeTabProps> = ({
     const potentialShards = Math.floor(Math.sqrt(totalEnergyProduced / 1000));
     const canPrestige = timelineStability >= 100 && potentialShards > 0;
 
+    const handlePrestige = () => {
+        if (canPrestige) {
+            prestige();
+            sfx.prestige();
+            trackPrestige(prestigeCount + 1, potentialShards);
+        }
+    };
+
     return (
         <div className="space-y-4">
             <h2 className="text-lg font-bold text-purple-400">Temporal Transcendence</h2>
@@ -497,7 +615,7 @@ const PrestigeTab: React.FC<PrestigeTabProps> = ({
                     </div>
                 </div>
                 <button
-                    onClick={prestige}
+                    onClick={handlePrestige}
                     disabled={!canPrestige}
                     className={`
                         w-full py-4 rounded-xl text-lg font-bold uppercase tracking-wider
