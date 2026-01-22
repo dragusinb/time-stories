@@ -21,7 +21,7 @@ const s1 = 'story-1';
 
 // --- PHASE 1: THE JOURNEY (Acts 1-10) ---
 story1Acts.push(
-    createAct(s1, 1, "The Shoulders of Giants", "July 16, 1969. Cape Kennedy. You stand on the gantry beside Neil, the humidity clinging to your flight suit. The Saturn V groans beneath you. 'You ready, kid?' Neil asks. You're the backup specialist, trained for the anomalies.", undefined, "/images/apollo/act-1.png"),
+    createAct(s1, 1, "The Shoulders of Giants", "July 16, 1969. Cape Kennedy. You are Neil Armstrong, commander of Apollo 11. The humidity clings to your flight suit as you stand on the gantry. The Saturn V groans beneath you, fully fueled—7.5 million pounds of explosive potential. Behind you are Buzz Aldrin and Mike Collins. Three men. One mission. The eyes of the world are watching.", undefined, "/images/apollo/act-1.png"),
     createAct(s1, 2, "Ignition", "The vibration rattles your teeth as the five F-1 engines ignite. 7.5 million pounds of thrust. The window fills with fire. You are leaving humanity behind, riding a pillar of fire into the void.", undefined, "/images/apollo/act-2.png"),
     createAct(s1, 3, "Orbit Insertion", "Silence. Zero G. The engines cut off. But Houston needs a systems check before the TLI burn. The fuel mixture indicators are fluctuating.", {
         id: 'mg-story-1-3',
@@ -39,7 +39,7 @@ story1Acts.push(
     }, "/images/apollo/act-4.png"),
     createAct(s1, 5, "Passive Thermal Control", "The ship begins the 'Barbecue Roll' to distribute the sun's heat. Earth is now just a distant marble. You feel the profound scale of the universe.", undefined, "/images/apollo/act-5.png"),
     createAct(s1, 6, "Lunar Orbit Insertion", "You enter the shadow of the moon. Radio silence. You must execute the braking burn perfectly to be captured by the moon's gravity.", undefined, "/images/apollo/act-6.png"),
-    createAct(s1, 7, "Undocking", "You join Neil and Buzz in the Lunar Module 'Eagle'. The separation is smooth, but the alarms blare. '1202 Alarm'. The computer is overloaded.", {
+    createAct(s1, 7, "Undocking", "You and Buzz float through the tunnel into the Lunar Module 'Eagle'. Mike Collins stays behind in Columbia—he will orbit alone for the next 21 hours. 'See you on the flip side,' he says. The separation is smooth, but then the alarms blare. '1202 Alarm'. The computer is overloaded.", {
         id: 'mg-story-1-7',
         type: 'cipher',
         question: "Decode the 1202 Alarm",
@@ -48,20 +48,20 @@ story1Acts.push(
         encrypted: "EXE-OVER-FLOW",
         decrypted: "EXECUTIVE OVERFLOW"
     }, "/images/apollo/act-7.png"),
-    createAct(s1, 8, "The Descent", "The computer is clear, but fuel is low. Neil takes manual control. You verify the landing radar readings against the visual landmarks.", {
+    createAct(s1, 8, "The Descent", "The computer alarm clears—Houston says 'continue.' But the landing zone is strewn with boulders the size of cars. You take semi-manual control, pitching Eagle forward, searching for a clear spot. Fuel drops: 60 seconds... 30 seconds... Charlie Duke's voice from Houston is steady but tense.", {
         id: 'mg-story-1-8',
         type: 'silo',
         question: "Fuel Level Critical",
         instructions: "Monitor the fuel tank pressure. Keep it steady.",
         winningCondition: "Touchdown Achieved"
     }, "/images/apollo/act-8.png"),
-    createAct(s1, 9, "Touchdown", "Contact light. Engine stop. 'The Eagle has landed.' The dust settles. You check the systems. Everything is green. We are on the Moon.", undefined, "/images/apollo/act-9.png"),
-    createAct(s1, 10, "Go/No-Go", "Mission Control gives the 'Stay' decision. You prepare the PLSS backpacks. It's time to go outside.", undefined, "/images/apollo/act-10.png")
+    createAct(s1, 9, "Touchdown", "A blue light illuminates on the panel. 'Contact light,' Buzz calls—the 67-inch probes beneath the landing pads have touched the surface. You hit the engine stop button. The LM settles with barely a bump. 'Houston, Tranquility Base here. The Eagle has landed.' Charlie Duke's voice breaks: 'Roger, Tranquility. You got a bunch of guys about to turn blue. We're breathing again.'", undefined, "/images/apollo/act-9.png"),
+    createAct(s1, 10, "Go/No-Go", "Houston confirms: 'Eagle, you are stay for T1.' A 'Stay' decision means you're cleared for extended surface operations. You and Buzz begin the 2-hour process of donning your PLSS backpacks—the Portable Life Support Systems that will keep you alive outside. The world is waiting.", undefined, "/images/apollo/act-10.png")
 );
 
 // --- PHASE 2: SURFACE OPERATIONS (Acts 11-20) ---
 story1Acts.push(
-    createAct(s1, 11, "One Small Step", "You stand on the porch. The ladder is just a few rungs, but it spans a billion years of evolution. You drop the last three feet. The dust puffs silently. The world watches, but you are alone. 'That's one small step for man...'", undefined, "/images/apollo/act-11.png"),
+    createAct(s1, 11, "One Small Step", "109:24:15 mission time. You stand on the LM's porch, gripping the handrails. The ladder is just nine rungs. You descend slowly, testing each step. At the bottom, you pause. Then you place your left boot on the lunar surface. The dust compresses silently. 'That's one small step for man, one giant leap for mankind.' You have 2.5 hours. Make them count.", undefined, "/images/apollo/act-11.png"),
     createAct(s1, 12, "Contingency Sample", "First rule: get a sample. If the engine explodes now, at least we bring something home. You grab the scoop and contingency sample bags. Each sample must be carefully collected and sealed to preserve the lunar vacuum. The bag seals with a satisfying snap.", {
         id: 'mg-story-1-12',
         type: 'sample',
@@ -69,11 +69,11 @@ story1Acts.push(
         instructions: "Gather rock and soil samples, then seal the container for return to Earth.",
         winningCondition: "Samples Secured"
     }, "/images/apollo/act-12.png"),
-    createAct(s1, 13, "Magnificent Desolation", "Aldrin joins you. You look out at the horizon. It's too close. The curvature is wrong. The colors are absolute—black sky, white ground. 'Magnificent desolation,' Buzz says. It is beautiful because it is dead.", undefined, "/images/apollo/act-13.png"),
+    createAct(s1, 13, "Magnificent Desolation", "Buzz joins you on the surface. The horizon is too close—only 1.5 miles away on this small world. The colors are absolute: black sky, grey-white ground, no atmosphere to blur the line. 'Magnificent desolation,' Buzz says. Above you, invisible beyond the sunlit surface, Mike Collins passes overhead in Columbia every two hours, the loneliest man in history.", undefined, "/images/apollo/act-13.png"),
     createAct(s1, 14, "Mobility", "Walking is impossible. You learn to skip, to hop like a kangaroo in slow motion. The 1/6th gravity is a seductive mistress; she lets you fly, but momentum is still a cruel master. You stumble, heart racing. A tear in the suit means death.", undefined, "/images/apollo/act-14.png"),
     createAct(s1, 15, "The Flag", "The kit is annoying. The telescoping rod jams. You hammer it in, but the soil is hard, resisting like frozen rubber. The flag hangs from its wire support, stiff and eternal in the vacuum. It does not wave; it poses.", undefined, "/images/apollo/act-15.png"),
     createAct(s1, 16, "The Call", "Nixon is on the line. The signal travels 240,000 miles, digitized and reassembled. His voice sounds ghostly. You stand at attention, saluting a voice from the sky. The irony is not lost on you.", undefined, "/images/apollo/act-16.png"),
-    createAct(s1, 17, "EASEP Deployment", "The scientific package is heavy. You lug the pallets out to a flat spot. The passive seismometer and the laser reflector. They look like foil toys, but they are the reason you are here. Science, not just flags.", undefined, "/images/apollo/act-17.png"),
+    createAct(s1, 17, "EASEP Deployment", "The Early Apollo Scientific Experiments Package—EASEP—is surprisingly heavy even in 1/6th gravity. You carry the two instruments to a flat spot 50 feet from Eagle: the Passive Seismic Experiment to detect moonquakes, and the Laser Ranging Retroreflector. Future missions will deploy the full ALSEP suite, but you are the first. You are proving it can be done.", undefined, "/images/apollo/act-17.png"),
     createAct(s1, 18, "Suit Integrity", "Your PLSS warning light flickers. Pressure fluctuation? You stop breathing for a second. The sound of the pumps is your only companion. You must diagnose the loop. Is it a sensor error or a leak?", {
         id: 'mg-story-1-18',
         type: 'diagnosis',
@@ -101,7 +101,7 @@ story1Acts.push(
 
 // --- PHASE 3: CLOSEOUT & ASCENT (Acts 21-30) ---
 story1Acts.push(
-    createAct(s1, 21, "The Core", "The timeline is tight. You hammer two core tubes into the ground. The soil fights back. It grasps the metal like a vice. You are gasping for air, sweat stinging your eyes. Just one more inch. For science.", undefined, "/images/apollo/act-21.png"),
+    createAct(s1, 21, "The Core", "Houston warns: 'Fifteen minutes to closeout.' The timeline is tight. You push the core tube into the regolith—the lunar soil is harder than expected, almost like wet sand frozen solid. You can only push it in a few inches. The sample will still tell us about billions of years of solar wind bombardment. Every grain is a time capsule.", undefined, "/images/apollo/act-21.png"),
     createAct(s1, 22, "Solar Wind", "Time to pack up. You retrieve the Solar Wind Composition foil. It has been soaking up the sun's breath for an hour. Helium, Neon, Argon. The building blocks of stars, trapped in a sheet of aluminum.", undefined, "/images/apollo/act-22.png"),
     createAct(s1, 23, "Contamination", "You hoist the rock boxes up the conveyor. Dust is everywhere. It is in the treads, on the suits, in the cabin. It smells like gunpowder. It is the smell of a dead world.", undefined, "/images/apollo/act-23.png"),
     createAct(s1, 24, "Weight Limits", "Computer says we are heavy. The ascent engine has no margin for error. We must jettison the non-essentials. The view is priceless; the boots are expendable. You toss them out the hatch.", {
@@ -112,9 +112,9 @@ story1Acts.push(
         instructions: "Keep the Moon Rocks. Jettison the PLSS and Overshoes.",
         winningCondition: "Ascent Weight Cleared"
     }, "/images/apollo/act-24.png"),
-    createAct(s1, 25, "The Broken Switch", "Panic in the silence. As you crawled back in, a backpack struck a circuit breaker. It snapped off. The 'Engine Arm' switch. Without it, you are stranded forever. A tomb of aluminum.", undefined, "/images/apollo/act-25.png"),
+    createAct(s1, 25, "The Broken Switch", "Before the rest period, you notice it: the Engine Arm circuit breaker is broken. Buzz's PLSS backpack struck it while maneuvering in the cramped cabin. The plastic switch snapped clean off. Without it, the ascent engine cannot be armed. Without the engine, you die here. Eagle becomes a tomb.", undefined, "/images/apollo/act-25.png"),
     createAct(s1, 26, "The Pen Solution", "Aldrin finds a solution. A felt-tipped pen fits perfectly into the hole. It works. The engine is armed. It is a moment of pure, ridiculous human ingenuity.", undefined, "/images/apollo/act-26.png"),
-    createAct(s1, 27, "Rest Period", "Mission Control orders you to sleep. It's cold, noisy, and light leaks in. You sleep fitfully on the engine cover, dreaming of blue skies and gravity.", undefined, "/images/apollo/act-27.png"),
+    createAct(s1, 27, "Rest Period", "Mission Control orders a rest period. You try to sleep in hammocks strung across the tiny cabin—Buzz on the floor, you curled up on the ascent engine cover. It's 61°F, the pumps drone constantly, and earthlight streams through the window. Neither of you sleeps more than a few fitful hours. In seven hours, you launch.", undefined, "/images/apollo/act-27.png"),
     createAct(s1, 28, "Ascent Ignition", "T-minus zero. The ascent engine fires. You climb vertically on a pillar of flame, leaving the descent stage—and the flag—behind. The acceleration pushes you into your seat.", {
         id: 'mg-story-1-28',
         type: 'silo',
@@ -123,12 +123,12 @@ story1Acts.push(
         winningCondition: "Orbit achieved."
     }, "/images/apollo/act-28.png"),
     createAct(s1, 29, "Orbit Insertion", "The engine cuts off. You are in lunar orbit. The silence returns. Now begins the needle-in-a-haystack search for Columbia.", undefined, "/images/apollo/act-29.png"),
-    createAct(s1, 30, "The Rendezvous", "You see a bright star. It's Mike Collins in Columbia. You use the radar to close the distance. Two tiny metal cans meeting in the dark.", undefined, "/images/apollo/act-30.png")
+    createAct(s1, 30, "The Rendezvous", "A bright star appears on the horizon—Columbia. Mike Collins, who has been alone for 21 hours, orbiting while you walked on another world. 'I got you, Eagle,' his voice crackles with relief. He photographed the moon, tracked your progress, and prepared for this moment. Two spacecraft, three men, reuniting 60 miles above the lunar surface.", undefined, "/images/apollo/act-30.png")
 );
 
 // --- PHASE 4: RETURN (Acts 31-40) ---
 story1Acts.push(
-    createAct(s1, 31, "Docking", "The two ships align. There's a thud, then the latches snap shut. You open the hatch. Collins is there, grinning. The smell of moon dust fills the Columbia.", {
+    createAct(s1, 31, "Docking", "The docking probe slides home. Latches snap shut. Hard dock. You open the hatch and Mike Collins is there, grinning ear to ear. He's been completely alone longer than any human in history—during each pass behind the moon, he was cut off from all contact with Earth. 'Welcome back,' he says. The smell of moon dust fills Columbia. It smells like gunpowder.", {
         id: 'mg-story-1-31',
         type: 'constellation',
         theme: 'apollo',
@@ -151,7 +151,7 @@ story1Acts.push(
     createAct(s1, 37, "Blackout", "You hit the atmosphere. Fire surrounds the windows. Ionized plasma blocks all radio signals. You are alone in the fireball. Gravity returns, crushing you into your couch.", undefined, "/images/apollo/act-37.png"),
     createAct(s1, 38, "Drogues Deployed", "The radio crackles. 'We hear you!' The drogue chutes pop out, jerking the capsule violent. The spin stops. You are falling through the clouds.", undefined, "/images/apollo/act-38.png"),
     createAct(s1, 39, "Splashdown", "The three main chutes open. Orange flowers in the blue sky. You hit the water with a massive jolt. The capsule flips over, then rights itself. You are home.", undefined, "/images/apollo/act-39.png"),
-    createAct(s1, 40, "Hornet + 3", "Divers attach the collar. You are hoisted into the helicopter. You land on the USS Hornet. The President is there. But all you want is the sweet taste of Earth air.", undefined, "/images/apollo/act-40.png")
+    createAct(s1, 40, "Hornet + 3", "Navy divers attach the flotation collar. You climb out, don biological isolation garments—NASA isn't taking chances with unknown lunar microbes. Helicopter 66 delivers you to the USS Hornet. President Nixon watches through the window of the Mobile Quarantine Facility. You'll spend 21 days in isolation. But you made it. Three men went to the Moon. Three men came home.", undefined, "/images/apollo/act-40.png")
 );
 
 // ==========================================
