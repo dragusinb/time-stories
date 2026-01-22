@@ -318,15 +318,15 @@ story3Acts.push(
     createAct(s3, 13, "The Test", "You set up the experiment in the palace. The King watches, his face unreadable. The goldsmith sweats. You lower the crown into the water. The level rises too high.", undefined, "/images/archimedes/act-13.png"),
     createAct(s3, 14, "The Result", "The King nods. 'Fake.' The goldsmith is dragged away to a fate you do not wish to witness. Archimedes has proven the power of the mind over matter.", undefined, "/images/archimedes/act-14.png"),
     createAct(s3, 15, "The Blockade", "The Romans return, stinging from their defeat. This time, they blockade the harbor. They will not fight; they will starve you out. The city walls become a prison.", undefined, "/images/archimedes/act-15.png"),
-    createAct(s3, 16, "The Balance", "Archimedes designs a new defense. Underwater mines. 'We must balance them,' he says. 'Neutral buoyancy. They must float, but not be seen.' He tasks you with the calibration.", {
+    createAct(s3, 16, "The Fire Ships", "Archimedes designs a new defense: fire ships. Old hulls filled with pitch, sulfur, and dry wood. 'They must float low,' he explains, 'barely visible, then ignite on contact.' You help calculate the ballast—too heavy and they sink, too light and the Romans spot them.", {
         id: 'mg-story-3-16',
         type: 'scale',
         theme: 'ancient',
-        question: "Balance the buoyancy mechanism.",
-        instructions: "Add weights to the left side to balance the Mine.",
-        winningCondition: "Balance the scale"
+        question: "Balance the fire ship's buoyancy.",
+        instructions: "Add ballast weights until the ship floats at the waterline—low but not sunk.",
+        winningCondition: "Balance achieved"
     }, "/images/archimedes/act-16.png"),
-    createAct(s3, 17, "The Sabotage", "Nightfall. You swim out to the Roman pontoon bridges. The water is cold and black. You attach the mines. The explosion shatters the silence. Wood splinters. Romans drown in their armor.", undefined, "/images/archimedes/act-17.png"),
+    createAct(s3, 17, "The Night Attack", "Nightfall. You release the fire ships into the current. They drift silently toward the Roman fleet, dark shapes on darker water. Then the pitch ignites. Flames leap from ship to ship. The Romans scramble, but fire on water cannot be fought. Half their fleet burns that night.", undefined, "/images/archimedes/act-17.png"),
     createAct(s3, 18, "The Hunger", "Months bleed by. Food strains. You help ration the grain using precise measurements. Every grain counts. The people are thin, their eyes hollow.", undefined, "/images/archimedes/act-18.png"),
     createAct(s3, 19, "The Traitor", "You spot a guard signaling a Roman ship with a mirror. You confront him. He draws a knife. 'We are starving!' he hisses. He vanishes into the shadows before you can stop him.", undefined, "/images/archimedes/act-19.png"),
     createAct(s3, 20, "The Sun", "Summer arrives. The heat is oppressive. Archimedes looks at the sun, then at the Roman sails. 'We can use this,' he whispers. 'The sun is not our enemy. It is our artillery.'", {
@@ -341,11 +341,11 @@ story3Acts.push(
 
 // ACT 21-30: The Mirrors & Optics
 story3Acts.push(
-    createAct(s3, 21, "The Mirror Plan", "He wants to build a hexagonal array of polished bronze shields. A 'burning glass'. It sounds impossible. 'Geometry,' he says, tapping his temple. 'All rays must meet at the focus.'", undefined, "/images/archimedes/act-21.png"),
+    createAct(s3, 21, "The Mirror Plan", "He wants to use soldiers' polished bronze shields as mirrors. 'If we focus the sun's rays on a single point...' The theory is sound—parabolic reflection. Whether it will work at this distance, against moving ships, is uncertain. But the Romans don't know that. Sometimes fear is the weapon.", undefined, "/images/archimedes/act-21.png"),
     createAct(s3, 22, "Polishing", "You mobilize the soldiers. 'Put down your swords,' you order. 'Polish your shields.' They grumble, but they obey. You need a surface like water.", undefined, "/images/archimedes/act-22.png"),
     createAct(s3, 23, "The Geometry", "Parabolic focus. You help him calculate the curvature. If the angle is off by a degree, the light scatters. It must be perfect.", undefined, "/images/archimedes/act-23.png"),
     createAct(s3, 24, "The Attack", "The Roman fleet approaches at noon. The sun is at its zenith. Archimedes stands on the wall, a conductor of light. 'Hold...' he commands.", undefined, "/images/archimedes/act-24.png"),
-    createAct(s3, 25, "The Death Ray", "You align the mirrors. A beam of pure white light cuts through the air. It hits the lead ship's sail. Smoke. Then, distinct flame. The Romans scream as their ships turn into pyres.", {
+    createAct(s3, 25, "The Burning Light", "You align the mirrors. The reflected light converges on the Roman flagship. Does it truly ignite? Later generations will debate this for millennia. But the Romans see the blinding flash, feel the heat. They panic. They retreat. Whether the sails burned or only the sailors' courage, the result is the same: Syracuse stands another day.", {
         id: 'mg-story-3-25',
         type: 'quiz',
         theme: 'ancient',
