@@ -12,9 +12,9 @@ interface BillingState {
     restorePurchases: () => Promise<void>;
 }
 
-// RevenueCat API Key
-const REVENUECAT_API_KEY = 'test_CeKmffdpccGlXCpmaoPJzLaGfPg';
-const PRO_ENTITLEMENT_ID = 'pro'; // Change this to match your RevenueCat Entitlement ID
+// RevenueCat configuration from environment variables
+const REVENUECAT_API_KEY = process.env.NEXT_PUBLIC_REVENUECAT_API_KEY || '';
+const PRO_ENTITLEMENT_ID = process.env.NEXT_PUBLIC_REVENUECAT_ENTITLEMENT_ID || 'pro';
 
 export const useBillingStore = create<BillingState>((set, get) => ({
     isInitialized: false,

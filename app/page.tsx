@@ -1,15 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { StoryCard } from '@/components/StoryCard';
 import { stories } from '@/lib/data';
 import TrophyRoom from '@/components/TrophyRoom';
 import Lab from '@/components/Lab';
+import Onboarding from '@/components/Onboarding';
+import { useOnboardingStore } from '@/lib/onboarding';
 import { Trophy, BookOpen, FlaskConical } from 'lucide-react';
 
 export default function Home() {
   const [viewMode, setViewMode] = useState<'stories' | 'trophies' | 'lab'>('stories');
+  const [isHydrated, setIsHydrated] = useState(false);
+  const hasCompletedOnboarding = useOnboardingStore((s) => s.hasCompletedOnboarding);
+
+  // Wait for hydration to avoid flash
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Show onboarding for first-time users
+  if (isHydrated && !hasCompletedOnboarding) {
+    return <Onboarding />;
+  }
 
   return (
     <main className="min-h-screen bg-slate-950 pb-20">
