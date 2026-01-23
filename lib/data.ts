@@ -50,10 +50,15 @@ story1Acts.push(
     }, "/images/apollo/act-7.png"),
     createAct(s1, 8, "The Descent", "The computer alarm clears—Houston says 'continue.' But the landing zone is strewn with boulders the size of cars. You take semi-manual control, pitching Eagle forward, searching for a clear spot. Fuel drops: 60 seconds... 30 seconds... Charlie Duke's voice from Houston is steady but tense.", {
         id: 'mg-story-1-8',
-        type: 'silo',
-        question: "Fuel Level Critical",
-        instructions: "Monitor the fuel tank pressure. Keep it steady.",
-        winningCondition: "Touchdown Achieved"
+        type: 'quiz',
+        theme: 'apollo',
+        question: "Landing Zone Selection",
+        instructions: "You have 20 seconds of fuel. Choose wisely.",
+        winningCondition: "Clear Zone Selected",
+        quizQuestion: "The programmed landing site is full of boulders. Armstrong takes manual control. What should you do?",
+        options: ["Land immediately to save fuel", "Fly west to find a clearer area", "Abort and return to orbit", "Hover and wait for instructions"],
+        correctAnswer: 1,
+        explanation: "Armstrong flew 400 feet west, finding a clear spot in the Sea of Tranquility with just 25 seconds of fuel remaining."
     }, "/images/apollo/act-8.png"),
     createAct(s1, 9, "Touchdown", "A blue light illuminates on the panel. 'Contact light,' Buzz calls—the 67-inch probes beneath the landing pads have touched the surface. You hit the engine stop button. The LM settles with barely a bump. 'Houston, Tranquility Base here. The Eagle has landed.' Charlie Duke's voice breaks: 'Roger, Tranquility. You got a bunch of guys about to turn blue. We're breathing again.'", undefined, "/images/apollo/act-9.png"),
     createAct(s1, 10, "Go/No-Go", "Houston confirms: 'Eagle, you are stay for T1.' A 'Stay' decision means you're cleared for extended surface operations. You and Buzz begin the 2-hour process of donning your PLSS backpacks—the Portable Life Support Systems that will keep you alive outside. The world is waiting.", undefined, "/images/apollo/act-10.png")
@@ -104,43 +109,18 @@ story1Acts.push(
     createAct(s1, 21, "The Core", "Houston warns: 'Fifteen minutes to closeout.' The timeline is tight. You push the core tube into the regolith—the lunar soil is harder than expected, almost like wet sand frozen solid. You can only push it in a few inches. The sample will still tell us about billions of years of solar wind bombardment. Every grain is a time capsule.", undefined, "/images/apollo/act-21.png"),
     createAct(s1, 22, "Solar Wind", "You roll up the Swiss-built Solar Wind Composition experiment—a sheet of aluminum foil that has collected particles streaming from the sun for 77 minutes. On Earth, the atmosphere blocks this solar wind. Here, particles traveling 400 km/sec embed directly in the foil. Analysis will reveal helium-3, neon, and argon—materials that may one day fuel fusion reactors.", undefined, "/images/apollo/act-22.png"),
     createAct(s1, 23, "Contamination", "You hoist the rock boxes up the conveyor. Dust is everywhere. It is in the treads, on the suits, in the cabin. It smells like gunpowder. It is the smell of a dead world.", undefined, "/images/apollo/act-23.png"),
-    createAct(s1, 24, "Pre-Ascent Prep", "Computer says we are heavy. The ascent engine has no margin for error—if it fails, there is no backup. You must jettison the non-essentials: the overshoes, the empty PLSS backpacks, even the armrests. The moon rocks stay. Then you follow the pre-ascent checklist exactly. There is only one chance.", {
-        id: 'mg-story-1-24',
-        type: 'sequence',
-        theme: 'apollo',
-        question: "Arrange the Pre-Ascent Sequence",
-        instructions: "Put the steps in the correct order for lunar liftoff.",
-        winningCondition: "Sequence verified. Ready for ascent.",
-        items: ["Pressurize cabin", "Arm ascent engine", "Jettison equipment", "Final weight check"],
-        correctOrder: ["Jettison equipment", "Final weight check", "Pressurize cabin", "Arm ascent engine"]
-    }, "/images/apollo/act-24.png"),
+    createAct(s1, 24, "Weight Limits", "Before closeout, the computer calculates: you are heavy. The ascent engine has no margin for error. You must jettison the non-essentials through the hatch: the overshoes, the empty PLSS backpacks, the armrests. The moon rocks stay—that's the whole point. The boots are expendable; the science is priceless.", undefined, "/images/apollo/act-24.png"),
     createAct(s1, 25, "The Broken Switch", "Before the rest period, you notice it: the Engine Arm circuit breaker is broken. Buzz's PLSS backpack struck it while maneuvering in the cramped cabin. The plastic switch snapped clean off. Without it, the ascent engine cannot be armed. Without the engine, you die here. Eagle becomes a tomb.", undefined, "/images/apollo/act-25.png"),
     createAct(s1, 26, "The Pen Solution", "Aldrin finds a solution. A felt-tipped pen fits perfectly into the hole. It works. The engine is armed. It is a moment of pure, ridiculous human ingenuity.", undefined, "/images/apollo/act-26.png"),
     createAct(s1, 27, "Rest Period", "Mission Control orders a rest period. You try to sleep in hammocks strung across the tiny cabin—Buzz on the floor, you curled up on the ascent engine cover. It's 61°F, the pumps drone constantly, and earthlight streams through the window. Neither of you sleeps more than a few fitful hours. In seven hours, you launch.", undefined, "/images/apollo/act-27.png"),
-    createAct(s1, 28, "Ascent Ignition", "T-minus ten seconds. Houston confirms: 'You're GO for liftoff.' Your finger hovers over the PROCEED button. The computer displays 'PRO' — the final authorization code. One button press and the ascent engine fires, carrying you off the Moon. There is no abort. The descent stage stays behind forever—along with the flag, the experiments, and your footprints.", {
-        id: 'mg-story-1-28',
-        type: 'cipher',
-        theme: 'apollo',
-        question: "Authorize Ignition Sequence",
-        instructions: "Type the ignition command to authorize liftoff.",
-        winningCondition: "Engine ignition confirmed.",
-        encrypted: "PRO",
-        decrypted: "PROCEED"
-    }, "/images/apollo/act-28.png"),
+    createAct(s1, 28, "Ascent Ignition", "T-minus ten seconds. Houston confirms: 'You're GO for liftoff.' Your finger hovers over the PROCEED button. The computer displays 'PRO' — the final authorization code. One button press and the ascent engine fires, carrying you off the Moon. There is no abort. The descent stage stays behind forever—along with the flag, the experiments, and your footprints. You press the button. The engine ignites.", undefined, "/images/apollo/act-28.png"),
     createAct(s1, 29, "Orbit Insertion", "The engine cuts off. You are in lunar orbit. The silence returns. Now begins the needle-in-a-haystack search for Columbia.", undefined, "/images/apollo/act-29.png"),
     createAct(s1, 30, "The Rendezvous", "A bright star appears on the horizon—Columbia. Mike Collins, who has been alone for 21 hours, orbiting while you walked on another world. 'I got you, Eagle,' his voice crackles with relief. He photographed the moon, tracked your progress, and prepared for this moment. Two spacecraft, three men, reuniting 60 miles above the lunar surface.", undefined, "/images/apollo/act-30.png")
 );
 
 // --- PHASE 4: RETURN (Acts 31-40) ---
 story1Acts.push(
-    createAct(s1, 31, "Docking", "The docking probe slides home. Latches snap shut. Hard dock. You open the hatch and Mike Collins is there, grinning ear to ear. He's been completely alone longer than any human in history—during each pass behind the moon, he was cut off from all contact with Earth. 'Welcome back,' he says. The smell of moon dust fills Columbia. It smells like gunpowder.", {
-        id: 'mg-story-1-31',
-        type: 'constellation',
-        theme: 'apollo',
-        question: "Align Docking Ports.",
-        instructions: "Match the rotation of the Eagle to Columbia.",
-        winningCondition: "Hard dock confirmed."
-    }, "/images/apollo/act-31.png"),
+    createAct(s1, 31, "Docking", "Eagle approaches Columbia. Mike Collins watches through Columbia's window, calling out corrections. 'A little left... steady... you're looking good.' The docking probe slides home. Latches snap shut. Hard dock. You open the hatch and Mike Collins is there, grinning ear to ear. He's been completely alone longer than any human in history—during each pass behind the moon, he was cut off from all contact with Earth. 'Welcome back,' he says. The smell of moon dust fills Columbia.", undefined, "/images/apollo/act-31.png"),
     createAct(s1, 32, "Jettison Eagle", "You transfer all the cargo to Columbia. You jettison the faithful lander. It drifts away, a golden spider against the black. Goodbye, old friend.", undefined, "/images/apollo/act-32.png"),
     createAct(s1, 33, "TEI Burn", "Trans-Earth Injection: the most critical burn of the mission. At 135:23:42, behind the Moon with no radio contact, the Service Propulsion System engine fires for 2 minutes 28 seconds. It accelerates you to 5,800 mph relative to the Moon—escape velocity. If the engine fails, there is no rescue possible. The engine burns perfectly. You're going home.", undefined, "/images/apollo/act-33.png"),
     createAct(s1, 34, "Earthrise", "As you orbit one last time, Earth rises over the lunar horizon—a blue and white marble suspended in infinite black. Apollo 8's 'Earthrise' photo helped spark the environmental movement. Now you see it yourself. All of human history, every war, every love, every invention, everything anyone has ever known—visible from here at arm's length. You feel a profound shift in perspective.", undefined, "/images/apollo/act-34.png"),
@@ -241,18 +221,12 @@ story2Acts.push(
     createAct(s2, 25, "The Riot", "The wealthy merchants are angry. The quarantine is costing them money. They incite a mob. 'The doctors are poisoning us!' they shout. They attack Ghiberti's house.", undefined, "/images/alchemist/act-25.png"),
     createAct(s2, 26, "The Hideout", "You drag the terrifyingly useless Ghiberti to safety in the catacombs. It's cool and dry here. No rats. You set up a new lab among the tombs of the old saints.", undefined, "/images/alchemist/act-26.png"),
     createAct(s2, 27, "The Mold", "The bread in your hideout goes moldy. Blue mold. Penicillium. You remember Fleming. You have the cure. It was growing on your lunch all along.", undefined, "/images/alchemist/act-27.png"),
-    createAct(s2, 28, "The Culture", "You grow the mold on broths. It smells earthy. You test it on a sick dog the Captain brought you. The dog recovers. You have an antibiotic.", {
+    createAct(s2, 28, "The Culture", "You grow the mold on broths. It smells earthy. You peer through your primitive microscope, searching for the strands that produce the healing compound. You test it on a sick dog the Captain brought you. The dog recovers. You have an antibiotic.", {
         id: 'mg-story-2-28',
-        type: 'quiz',
-        question: "Identify the correct Penicillium mold culture.",
-        instructions: "Select the mold that inhibits bacterial growth.",
-        options: [
-            "Green/Blue mold with a white edge",
-            "Black furry mold",
-            "Yellow slime mold",
-            "Red spotted mold"
-        ],
-        correctOption: 0
+        type: 'microscope',
+        question: "Identify the Penicillium Culture",
+        instructions: "Find the correct mold structure under the microscope.",
+        winningCondition: "Penicillium identified"
     }, "/images/alchemist/act-28.png"),
     createAct(s2, 29, "Patient Zero", "The Contessa is sick again. Not food poisoning this time. The Plague. Ghiberti is too afraid to go. You wear your mask and take your mold 'juice'.", undefined, "/images/alchemist/act-29.png"),
     createAct(s2, 30, "The Return", "You emerge from the catacombs in your mask. Use the tunnels to reach the palace unseen. The guards let you pass. They know the Beak Doctor is their only hope.", undefined, "/images/alchemist/act-30.png")
