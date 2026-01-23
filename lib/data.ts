@@ -43,25 +43,25 @@ story1Acts.push(
     createAct(s1, 6, "Lunar Orbit Insertion", "75 hours into the mission. You pass behind the Moon, losing radio contact with Earth for the first time. For 34 minutes, you are utterly alone. The Service Module engine must fire precisely—too short, you skip off into solar orbit; too long, you crash. At 75:49:50, the engine ignites for 357.5 seconds. When you emerge, Houston's voice crackles: 'Apollo 11, we're reading you.'", undefined, "/images/apollo/act-6.png"),
     createAct(s1, 7, "Undocking", "You and Buzz float through the tunnel into the Lunar Module 'Eagle'. Mike Collins stays behind in Columbia—he will orbit alone for the next 21 hours. 'See you on the flip side,' he says. The separation is smooth, but then the alarms blare. '1202 Alarm'. The computer is overloaded.", {
         id: 'mg-story-1-7',
-        type: 'cipher',
+        type: 'timeline',
         theme: 'apollo',
-        question: "Decode the 1202 Alarm",
-        instructions: "Enter the override code: EXECUTIVE OVERFLOW",
-        winningCondition: "Buffer Cleared",
-        encrypted: "EXE-OVER-FLOW",
-        decrypted: "EXECUTIVE OVERFLOW"
+        question: "1202 Program Alarm",
+        instructions: "Steve Bales at Mission Control must call GO or NO-GO. How many seconds does he have to decide before abort becomes mandatory?",
+        winningCondition: "Correct Decision Window",
+        minVal: 5,
+        maxVal: 60,
+        correctVal: 26,
+        unit: "seconds"
     }, "/images/apollo/act-7.png"),
     createAct(s1, 8, "The Descent", "The computer alarm clears—Houston says 'continue.' But the landing zone is strewn with boulders the size of cars. You take semi-manual control, pitching Eagle forward, searching for a clear spot. Fuel drops: 60 seconds... 30 seconds... Charlie Duke's voice from Houston is steady but tense.", {
         id: 'mg-story-1-8',
         type: 'quiz',
         theme: 'apollo',
-        question: "Landing Zone Selection",
-        instructions: "You have 20 seconds of fuel. Choose wisely.",
+        question: "The programmed landing site is full of boulders. Armstrong takes manual control. What should you do?",
+        instructions: "You have 20 seconds of fuel remaining. Choose wisely.",
         winningCondition: "Clear Zone Selected",
-        quizQuestion: "The programmed landing site is full of boulders. Armstrong takes manual control. What should you do?",
         options: ["Land immediately to save fuel", "Fly west to find a clearer area", "Abort and return to orbit", "Hover and wait for instructions"],
-        correctAnswer: 1,
-        explanation: "Armstrong flew 400 feet west, finding a clear spot in the Sea of Tranquility with just 25 seconds of fuel remaining."
+        correctOption: 1
     }, "/images/apollo/act-8.png"),
     createAct(s1, 9, "Touchdown", "A blue light illuminates on the panel. 'Contact light,' Buzz calls—the 67-inch probes beneath the landing pads have touched the surface. You hit the engine stop button. The LM settles with barely a bump. 'Houston, Tranquility Base here. The Eagle has landed.' Charlie Duke's voice breaks: 'Roger, Tranquility. You got a bunch of guys about to turn blue. We're breathing again.'", undefined, "/images/apollo/act-9.png"),
     createAct(s1, 10, "Go/No-Go", "Houston confirms: 'Eagle, you are stay for T1.' A 'Stay' decision means you're cleared for extended surface operations. You and Buzz begin the 2-hour process of donning your PLSS backpacks—the Portable Life Support Systems that will keep you alive outside. The world is waiting.", undefined, "/images/apollo/act-10.png")

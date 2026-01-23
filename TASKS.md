@@ -13,7 +13,7 @@ Last updated: 2024-01-23
 |-----|------|--------|-------|
 | 3 | silo | ✅ | Verify Oxygen Mixture |
 | 4 | constellation | ✅ | Align Navigation Star |
-| 7 | cipher | ✅ | Decode 1202 Alarm |
+| 7 | timeline | ✅ | 1202 Alarm Decision Window |
 | 8 | quiz | ✅ | Landing Zone Selection |
 | 12 | sample | ✅ | Collect Lunar Samples |
 | 18 | diagnosis | ✅ | Diagnose Suit |
@@ -77,6 +77,8 @@ Example prompt:
 - [x] Pass theme to CentrifugeGame in StoryReader
 - [x] Created CLAUDE.md with guidelines
 - [x] Created TASKS.md for tracking
+- [x] Fix Act 7 cipher → timeline (easier minigame)
+- [x] Fix Act 8 quiz TypeScript error (invalid properties)
 
 ---
 
@@ -91,10 +93,10 @@ Example prompt:
 
 ## MINIGAME TYPES BY STORY
 
-**Apollo:** silo, constellation, cipher, quiz, sample, diagnosis, scale, alignment, sequence, memory, centrifuge, checklist
+**Apollo:** silo, constellation, timeline, quiz, sample, diagnosis, scale, alignment, sequence, memory, centrifuge, checklist
 
 **Alchemist:** mixing, quiz, ratcatcher, grinding, lens, microscope, sanitation
 
 **Archimedes:** circle, defense, displacement, scale, gears, quiz, sequence, catapult
 
-**Unused:** timeline, symbolmatching, mirror, chemistry, debate, ritual, tangram, lenscrafting, triage
+**Unused:** cipher, symbolmatching, mirror, chemistry, debate, ritual, tangram, lenscrafting, triage
