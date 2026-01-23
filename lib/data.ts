@@ -104,13 +104,15 @@ story1Acts.push(
     createAct(s1, 21, "The Core", "Houston warns: 'Fifteen minutes to closeout.' The timeline is tight. You push the core tube into the regolith—the lunar soil is harder than expected, almost like wet sand frozen solid. You can only push it in a few inches. The sample will still tell us about billions of years of solar wind bombardment. Every grain is a time capsule.", undefined, "/images/apollo/act-21.png"),
     createAct(s1, 22, "Solar Wind", "You roll up the Swiss-built Solar Wind Composition experiment—a sheet of aluminum foil that has collected particles streaming from the sun for 77 minutes. On Earth, the atmosphere blocks this solar wind. Here, particles traveling 400 km/sec embed directly in the foil. Analysis will reveal helium-3, neon, and argon—materials that may one day fuel fusion reactors.", undefined, "/images/apollo/act-22.png"),
     createAct(s1, 23, "Contamination", "You hoist the rock boxes up the conveyor. Dust is everywhere. It is in the treads, on the suits, in the cabin. It smells like gunpowder. It is the smell of a dead world.", undefined, "/images/apollo/act-23.png"),
-    createAct(s1, 24, "Weight Limits", "Computer says we are heavy. The ascent engine has no margin for error. We must jettison the non-essentials. The view is priceless; the boots are expendable. You toss them out the hatch.", {
+    createAct(s1, 24, "Pre-Ascent Prep", "Computer says we are heavy. The ascent engine has no margin for error—if it fails, there is no backup. You must jettison the non-essentials: the overshoes, the empty PLSS backpacks, even the armrests. The moon rocks stay. Then you follow the pre-ascent checklist exactly. There is only one chance.", {
         id: 'mg-story-1-24',
-        type: 'triage',
+        type: 'sequence',
         theme: 'apollo',
-        question: "Select Items for Jettison.",
-        instructions: "Keep the Moon Rocks. Jettison the PLSS and Overshoes.",
-        winningCondition: "Ascent Weight Cleared"
+        question: "Arrange the Pre-Ascent Sequence",
+        instructions: "Put the steps in the correct order for lunar liftoff.",
+        winningCondition: "Sequence verified. Ready for ascent.",
+        items: ["Pressurize cabin", "Arm ascent engine", "Jettison equipment", "Final weight check"],
+        correctOrder: ["Jettison equipment", "Final weight check", "Pressurize cabin", "Arm ascent engine"]
     }, "/images/apollo/act-24.png"),
     createAct(s1, 25, "The Broken Switch", "Before the rest period, you notice it: the Engine Arm circuit breaker is broken. Buzz's PLSS backpack struck it while maneuvering in the cramped cabin. The plastic switch snapped clean off. Without it, the ascent engine cannot be armed. Without the engine, you die here. Eagle becomes a tomb.", undefined, "/images/apollo/act-25.png"),
     createAct(s1, 26, "The Pen Solution", "Aldrin finds a solution. A felt-tipped pen fits perfectly into the hole. It works. The engine is armed. It is a moment of pure, ridiculous human ingenuity.", undefined, "/images/apollo/act-26.png"),
