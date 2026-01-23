@@ -1,28 +1,66 @@
-# Project Notes for Claude
+# Claude Quick Reference
 
-## Image Generation Guidelines
+**Full guide: See STORY_GUIDE.md**
 
-**IMPORTANT: All images should be in PIXEL ART style**
+---
 
-When generating images for the Apollo story (or any story), use pixel art style:
-- "16-bit pixel art style" or "retro pixel art"
-- Limited color palette
-- Blocky/pixelated appearance
-- Game-like aesthetic
-- NO realistic photography style
-- NO photorealistic renders
+## CRITICAL RULES
 
-Example prompt structure:
+### Images
 ```
-16-bit pixel art style, [scene description], limited color palette, retro game aesthetic, no text
+16-bit pixel art style, [scene], limited color palette, retro game aesthetic, no text
 ```
 
-## Story Themes
+### Acts
+- Present tense, second person ("You stand...")
+- 50-100 words
+- Specific numbers and details
+- Historically accurate - verify everything
 
-- **Apollo (Story 1)**: 1969 Moon landing, historically accurate
-- **Alchemist (Story 2)**: Medieval Prague, alchemy, mystery
-- **Archimedes (Story 3)**: Ancient Syracuse, Greek mathematician
+### Minigames
+- ~1 per 4-5 acts
+- NO DUPLICATES within same story
+- Must fit narrative moment
 
-## Minigame Types
+---
 
-Each story uses various minigames. Ensure theme prop is passed correctly to minigame components.
+## MINIGAME TYPES (Pick unique per story)
+
+**Timing:** silo, centrifuge
+**Puzzle:** cipher, sequence, tangram, displacement
+**Skill:** alignment, scale, circle, catapult, defense
+**Collection:** sample, ratcatcher
+**Knowledge:** quiz, diagnosis
+**Memory:** memory, symbolmatching
+**Crafting:** mixing, grinding, lens, microscope
+**Procedure:** checklist, sanitation
+**Navigation:** constellation, gears, timeline
+
+---
+
+## IMAGE COMMAND
+
+```powershell
+.\generate-image.ps1 -Prompt "16-bit pixel art style, [scene], limited color palette, retro game aesthetic, no text" -OutputPath "public/images/[story]/act-[N].png"
+```
+
+---
+
+## STORY THEMES
+
+| Story | Theme | Era |
+|-------|-------|-----|
+| Apollo (s1) | apollo | 1969 Moon landing |
+| Alchemist (s2) | medieval | 1348 Black Death |
+| Archimedes (s3) | ancient | 212 BC Syracuse |
+
+---
+
+## BEFORE COMMITTING
+
+- [ ] All facts verified
+- [ ] No duplicate minigame types
+- [ ] Images are pixel art
+- [ ] No text in images
+- [ ] Present tense, second person
+- [ ] Theme prop passed to minigames
