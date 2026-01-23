@@ -117,12 +117,15 @@ story1Acts.push(
     createAct(s1, 25, "The Broken Switch", "Before the rest period, you notice it: the Engine Arm circuit breaker is broken. Buzz's PLSS backpack struck it while maneuvering in the cramped cabin. The plastic switch snapped clean off. Without it, the ascent engine cannot be armed. Without the engine, you die here. Eagle becomes a tomb.", undefined, "/images/apollo/act-25.png"),
     createAct(s1, 26, "The Pen Solution", "Aldrin finds a solution. A felt-tipped pen fits perfectly into the hole. It works. The engine is armed. It is a moment of pure, ridiculous human ingenuity.", undefined, "/images/apollo/act-26.png"),
     createAct(s1, 27, "Rest Period", "Mission Control orders a rest period. You try to sleep in hammocks strung across the tiny cabin—Buzz on the floor, you curled up on the ascent engine cover. It's 61°F, the pumps drone constantly, and earthlight streams through the window. Neither of you sleeps more than a few fitful hours. In seven hours, you launch.", undefined, "/images/apollo/act-27.png"),
-    createAct(s1, 28, "Ascent Ignition", "T-minus zero. The ascent engine fires. You climb vertically on a pillar of flame, leaving the descent stage—and the flag—behind. The acceleration pushes you into your seat.", {
+    createAct(s1, 28, "Ascent Ignition", "T-minus ten seconds. Houston confirms: 'You're GO for liftoff.' Your finger hovers over the PROCEED button. The computer displays 'PRO' — the final authorization code. One button press and the ascent engine fires, carrying you off the Moon. There is no abort. The descent stage stays behind forever—along with the flag, the experiments, and your footprints.", {
         id: 'mg-story-1-28',
-        type: 'silo',
-        question: "Monitor Ascent Thrust.",
-        instructions: "Keep the thrust vector centered to reach orbit.",
-        winningCondition: "Orbit achieved."
+        type: 'cipher',
+        theme: 'apollo',
+        question: "Authorize Ignition Sequence",
+        instructions: "Type the ignition command to authorize liftoff.",
+        winningCondition: "Engine ignition confirmed.",
+        encrypted: "PRO",
+        decrypted: "PROCEED"
     }, "/images/apollo/act-28.png"),
     createAct(s1, 29, "Orbit Insertion", "The engine cuts off. You are in lunar orbit. The silence returns. Now begins the needle-in-a-haystack search for Columbia.", undefined, "/images/apollo/act-29.png"),
     createAct(s1, 30, "The Rendezvous", "A bright star appears on the horizon—Columbia. Mike Collins, who has been alone for 21 hours, orbiting while you walked on another world. 'I got you, Eagle,' his voice crackles with relief. He photographed the moon, tracked your progress, and prepared for this moment. Two spacecraft, three men, reuniting 60 miles above the lunar surface.", undefined, "/images/apollo/act-30.png")
