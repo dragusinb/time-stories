@@ -25,11 +25,13 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
     const [lockedReadings, setLockedReadings] = useState<number[]>([]);
     const [isComplete, setIsComplete] = useState(false);
     const [lastAttempt, setLastAttempt] = useState<'success' | 'miss' | null>(null);
-    const [speed, setSpeed] = useState(1);
+    const [missCount, setMissCount] = useState(0); // Track misses
+    const [speedMultiplier, setSpeedMultiplier] = useState(1); // Increases on reset
 
     const READINGS_NEEDED = 3;
     const TARGET_ZONE = 15; // ±15 degrees from center (so -15 to +15 is the green zone)
     const MAX_ANGLE = 60;
+    const MAX_MISSES = 3; // Reset after 3 misses
 
     const animationRef = useRef<number | null>(null);
     const directionRef = useRef(1);
@@ -41,7 +43,7 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
     useEffect(() => {
         if (isComplete) return;
 
-        const baseSpeed = 0.8 + (lockedReadings.length * 0.3); // Gets faster with each lock (but starts slow)
+        const baseSpeed = (0.8 + (lockedReadings.length * 0.3)) * speedMultiplier; // Gets faster with each lock and reset
 
         const animate = () => {
             angleRef.current += directionRef.current * baseSpeed;
@@ -66,7 +68,7 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [isComplete, lockedReadings.length]);
+    }, [isComplete, lockedReadings.length, speedMultiplier]);
 
     const handleLock = useCallback(() => {
         if (isComplete) return;
@@ -78,6 +80,7 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
             const newReadings = [...lockedReadings, angleRef.current];
             setLockedReadings(newReadings);
             setLastAttempt('success');
+            setMissCount(0); // Reset miss count on success
 
             if (newReadings.length >= READINGS_NEEDED) {
                 setIsComplete(true);
@@ -87,13 +90,24 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
                 setTimeout(() => onComplete(score), 1500);
             }
         } else {
-            // Miss - just show feedback, no penalty
+            // Miss - add penalty
+            const newMissCount = missCount + 1;
+            setMissCount(newMissCount);
             setLastAttempt('miss');
+
+            if (newMissCount >= MAX_MISSES) {
+                // Reset progress! System destabilized
+                setTimeout(() => {
+                    setLockedReadings([]);
+                    setMissCount(0);
+                    setSpeedMultiplier(prev => Math.min(prev + 0.2, 2)); // Speed up as penalty
+                }, 500);
+            }
         }
 
         // Clear feedback after a moment
         setTimeout(() => setLastAttempt(null), 400);
-    }, [isComplete, lockedReadings, onComplete]);
+    }, [isComplete, lockedReadings, missCount, onComplete]);
 
     // Calculate needle position on the arc
     const getNeedleStyle = () => {
@@ -121,31 +135,48 @@ const SiloGame: React.FC<SiloGameProps> = ({ minigame, onComplete, theme = 'apol
                 </p>
             </div>
 
-            {/* Progress Indicators */}
-            <div className="flex items-center gap-3">
-                {Array.from({ length: READINGS_NEEDED }).map((_, i) => (
+            {/* Progress and Miss Indicators */}
+            <div className="flex flex-col items-center gap-2">
+                {/* Success Progress */}
+                <div className="flex items-center gap-3">
+                    {Array.from({ length: READINGS_NEEDED }).map((_, i) => (
+                        <motion.div
+                            key={i}
+                            className={`
+                                w-10 h-10 md:w-12 md:h-12 rounded-full border-2 flex items-center justify-center
+                                ${i < lockedReadings.length
+                                    ? 'bg-green-500 border-green-400'
+                                    : isApollo
+                                        ? 'bg-slate-900 border-green-800'
+                                        : 'bg-slate-800 border-slate-600'
+                                }
+                            `}
+                            animate={i < lockedReadings.length ? { scale: [1, 1.2, 1] } : {}}
+                        >
+                            {i < lockedReadings.length ? (
+                                <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                            ) : (
+                                <span className={`text-lg font-bold ${isApollo ? 'text-green-700' : 'text-slate-500'}`}>
+                                    {i + 1}
+                                </span>
+                            )}
+                        </motion.div>
+                    ))}
+                </div>
+
+                {/* Miss Counter - Warning */}
+                {missCount > 0 && !isComplete && (
                     <motion.div
-                        key={i}
-                        className={`
-                            w-10 h-10 md:w-12 md:h-12 rounded-full border-2 flex items-center justify-center
-                            ${i < lockedReadings.length
-                                ? 'bg-green-500 border-green-400'
-                                : isApollo
-                                    ? 'bg-slate-900 border-green-800'
-                                    : 'bg-slate-800 border-slate-600'
-                            }
-                        `}
-                        animate={i < lockedReadings.length ? { scale: [1, 1.2, 1] } : {}}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-2 text-red-400 text-sm font-mono"
                     >
-                        {i < lockedReadings.length ? (
-                            <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                        ) : (
-                            <span className={`text-lg font-bold ${isApollo ? 'text-green-700' : 'text-slate-500'}`}>
-                                {i + 1}
-                            </span>
+                        <span>WARNINGS: {missCount}/{MAX_MISSES}</span>
+                        {missCount === MAX_MISSES - 1 && (
+                            <span className="text-red-500 animate-pulse">SYSTEM UNSTABLE!</span>
                         )}
                     </motion.div>
-                ))}
+                )}
             </div>
 
             {/* Gauge */}

@@ -16,50 +16,99 @@ interface ChecklistItem {
     system: string;
     status: 'nominal' | 'caution' | 'warning';
     checked: boolean;
+    fixed: boolean; // Whether caution item has been fixed
     description: string;
+    cautionDescription?: string;
+    fixAction?: string;
 }
 
 /**
- * ChecklistGame - Systems Verification
+ * ChecklistGame - Systems Verification (Redesigned)
  *
- * Historical Context: Before re-entry, Apollo astronauts went through extensive
- * checklists to verify all systems were GO. This wasn't a puzzle - it was
- * methodical verification. Each system had to be confirmed operational.
+ * NEW CHALLENGE: Some systems randomly show CAUTION status.
+ * You must IDENTIFY and FIX these issues before confirming.
+ * Blindly clicking won't work - you need to pay attention!
  *
- * Gameplay: Review each system and confirm its status. Identify any
- * systems showing warnings. All systems must be checked before proceeding.
+ * - Nominal items: Just verify (tap once)
+ * - Caution items: Tap to see issue, then tap FIX button
+ * - Must fix ALL cautions before confirming re-entry
  */
 const ChecklistGame: React.FC<ChecklistGameProps> = ({ minigame, onComplete, theme = 'apollo' }) => {
-    const [items, setItems] = useState<ChecklistItem[]>([
-        { id: 'heatshield', system: 'Heat Shield', status: 'nominal', checked: false, description: 'Ablative shield temperature sensors normal' },
-        { id: 'chutes', system: 'Parachutes', status: 'nominal', checked: false, description: 'Drogue and main chute deployment armed' },
-        { id: 'attitude', system: 'Attitude Control', status: 'nominal', checked: false, description: 'RCS thrusters pressurized and ready' },
-        { id: 'comms', system: 'Communications', status: 'nominal', checked: false, description: 'S-band antenna configured for blackout recovery' },
-        { id: 'power', system: 'Electrical Power', status: 'nominal', checked: false, description: 'Battery charge at 94%, sufficient for re-entry' },
-        { id: 'lifesupport', system: 'Life Support', status: 'nominal', checked: false, description: 'O2 and CO2 levels within parameters' },
-    ]);
+    // Initialize with random caution items
+    const [items, setItems] = useState<ChecklistItem[]>(() => {
+        const baseItems: ChecklistItem[] = [
+            { id: 'heatshield', system: 'Heat Shield', status: 'nominal', checked: false, fixed: false, description: 'Ablative shield temperature sensors normal', cautionDescription: 'Sensor 3 showing elevated temperature!', fixAction: 'Recalibrate sensor' },
+            { id: 'chutes', system: 'Parachutes', status: 'nominal', checked: false, fixed: false, description: 'Drogue and main chute deployment armed', cautionDescription: 'Drogue release pyro shows low continuity!', fixAction: 'Switch to backup circuit' },
+            { id: 'attitude', system: 'Attitude Control', status: 'nominal', checked: false, fixed: false, description: 'RCS thrusters pressurized and ready', cautionDescription: 'Roll thruster B pressure dropping!', fixAction: 'Isolate and compensate' },
+            { id: 'comms', system: 'Communications', status: 'nominal', checked: false, fixed: false, description: 'S-band antenna configured for blackout recovery', cautionDescription: 'Antenna gimbal showing intermittent lock!', fixAction: 'Reset gimbal motor' },
+            { id: 'power', system: 'Electrical Power', status: 'nominal', checked: false, fixed: false, description: 'Battery charge at 94%, sufficient for re-entry', cautionDescription: 'Battery C showing voltage fluctuation!', fixAction: 'Switch to battery redundancy' },
+            { id: 'lifesupport', system: 'Life Support', status: 'nominal', checked: false, fixed: false, description: 'O2 and CO2 levels within parameters', cautionDescription: 'CO2 scrubber efficiency at 78%!', fixAction: 'Increase fan speed' },
+        ];
+
+        // Randomly set 1-2 items to caution
+        const shuffled = [...baseItems].sort(() => Math.random() - 0.5);
+        const numCautions = Math.random() > 0.5 ? 2 : 1;
+        for (let i = 0; i < numCautions; i++) {
+            shuffled[i].status = 'caution';
+        }
+
+        return baseItems; // Return in original order but with random cautions
+    });
 
     const [isComplete, setIsComplete] = useState(false);
     const [allGo, setAllGo] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
     const isApollo = theme === 'apollo';
     const checkedCount = items.filter(i => i.checked).length;
     const allChecked = checkedCount === items.length;
+    const cautionItems = items.filter(i => i.status === 'caution');
+    const unfixedCautions = cautionItems.filter(i => !i.fixed);
+    const allCautionsFixed = unfixedCautions.length === 0;
 
     const handleCheck = (itemId: string) => {
         if (isComplete) return;
 
+        const item = items.find(i => i.id === itemId);
+        if (!item) return;
+
+        // If it's a caution item and not yet checked, show the warning first
+        if (item.status === 'caution' && !item.checked) {
+            setSelectedItem(itemId);
+            setItems(prev => prev.map(i =>
+                i.id === itemId ? { ...i, checked: true } : i
+            ));
+        } else if (item.status === 'nominal') {
+            // Nominal items just get checked
+            setItems(prev => prev.map(i =>
+                i.id === itemId ? { ...i, checked: true } : i
+            ));
+        }
+    };
+
+    const handleFix = (itemId: string) => {
+        if (isComplete) return;
+
         setItems(prev => prev.map(item =>
-            item.id === itemId ? { ...item, checked: true } : item
+            item.id === itemId ? { ...item, fixed: true, status: 'nominal' } : item
         ));
+        setSelectedItem(null);
     };
 
     const handleConfirmAll = () => {
         if (!allChecked || isComplete) return;
 
+        // Check if there are unfixed caution items
+        if (!allCautionsFixed) {
+            // Don't allow - need to fix cautions first
+            return;
+        }
+
         setAllGo(true);
         setIsComplete(true);
-        setTimeout(() => onComplete(100), 1500);
+        // Score based on how quickly they fixed issues
+        const score = 100;
+        setTimeout(() => onComplete(score), 1500);
     };
 
     const getStatusColor = (status: string, checked: boolean) => {
@@ -129,54 +178,78 @@ const ChecklistGame: React.FC<ChecklistGameProps> = ({ minigame, onComplete, the
                 {/* Items */}
                 <div className="divide-y divide-slate-800">
                     {items.map((item, index) => (
-                        <motion.button
+                        <motion.div
                             key={item.id}
-                            onClick={() => handleCheck(item.id)}
-                            disabled={item.checked || isComplete}
-                            className={`
-                                w-full px-4 py-3 flex items-start gap-3 text-left transition-all
-                                ${getStatusBg(item.status, item.checked)}
-                                ${!item.checked && !isComplete ? 'hover:bg-green-900/20 cursor-pointer' : ''}
-                                disabled:cursor-default
-                            `}
+                            className={`${getStatusBg(item.status, item.checked)}`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
                         >
-                            {/* Checkbox */}
-                            <div className={`mt-0.5 ${getStatusColor(item.status, item.checked)}`}>
-                                {item.checked ? (
-                                    <CheckSquare className="w-5 h-5" />
-                                ) : (
-                                    <Square className="w-5 h-5" />
-                                )}
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                    <span className={`font-medium ${item.checked ? 'text-white' : isApollo ? 'text-green-300' : 'text-slate-300'}`}>
-                                        {item.system}
-                                    </span>
-                                    {item.checked && (
-                                        <span className={`
-                                            text-xs font-mono px-2 py-0.5 rounded
-                                            ${item.status === 'nominal'
-                                                ? 'bg-green-500/20 text-green-400'
-                                                : item.status === 'caution'
-                                                    ? 'bg-amber-500/20 text-amber-400'
-                                                    : 'bg-red-500/20 text-red-400'
-                                            }
-                                        `}>
-                                            {item.status === 'nominal' ? 'GO' : item.status.toUpperCase()}
-                                        </span>
+                            <button
+                                onClick={() => handleCheck(item.id)}
+                                disabled={item.checked || isComplete}
+                                className={`
+                                    w-full px-4 py-3 flex items-start gap-3 text-left transition-all
+                                    ${!item.checked && !isComplete ? 'hover:bg-green-900/20 cursor-pointer' : ''}
+                                    disabled:cursor-default
+                                `}
+                            >
+                                {/* Checkbox */}
+                                <div className={`mt-0.5 ${getStatusColor(item.status, item.checked)}`}>
+                                    {item.checked ? (
+                                        <CheckSquare className="w-5 h-5" />
+                                    ) : (
+                                        <Square className="w-5 h-5" />
                                     )}
                                 </div>
-                                <p className={`text-xs mt-1 ${item.checked ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    {item.checked ? item.description : 'Tap to verify...'}
-                                </p>
-                            </div>
-                        </motion.button>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <span className={`font-medium ${item.checked ? 'text-white' : isApollo ? 'text-green-300' : 'text-slate-300'}`}>
+                                            {item.system}
+                                        </span>
+                                        {item.checked && (
+                                            <span className={`
+                                                text-xs font-mono px-2 py-0.5 rounded
+                                                ${item.status === 'nominal'
+                                                    ? 'bg-green-500/20 text-green-400'
+                                                    : item.status === 'caution'
+                                                        ? 'bg-amber-500/20 text-amber-400 animate-pulse'
+                                                        : 'bg-red-500/20 text-red-400'
+                                                }
+                                            `}>
+                                                {item.status === 'nominal' ? 'GO' : item.fixed ? 'FIXED' : 'CAUTION'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className={`text-xs mt-1 ${item.checked ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        {item.checked
+                                            ? item.status === 'caution' && !item.fixed
+                                                ? item.cautionDescription
+                                                : item.description
+                                            : 'Tap to verify...'}
+                                    </p>
+                                </div>
+                            </button>
+
+                            {/* Fix Button for Caution Items */}
+                            {item.checked && item.status === 'caution' && !item.fixed && !isComplete && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="px-4 pb-3"
+                                >
+                                    <button
+                                        onClick={() => handleFix(item.id)}
+                                        className="w-full py-2 px-4 bg-amber-600 hover:bg-amber-500 text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <AlertTriangle className="w-4 h-4" />
+                                        {item.fixAction || 'Apply Fix'}
+                                    </button>
+                                </motion.div>
+                            )}
+                        </motion.div>
                     ))}
                 </div>
             </div>
@@ -189,14 +262,28 @@ const ChecklistGame: React.FC<ChecklistGameProps> = ({ minigame, onComplete, the
                         animate={{ opacity: 1, y: 0 }}
                         className={`
                             w-full max-w-md px-4 py-3 rounded-lg border text-center
-                            ${isApollo
-                                ? 'bg-green-900/30 border-green-600 text-green-400'
+                            ${allCautionsFixed
+                                ? isApollo
+                                    ? 'bg-green-900/30 border-green-600 text-green-400'
+                                    : 'bg-green-900/30 border-green-600 text-green-400'
                                 : 'bg-amber-900/30 border-amber-600 text-amber-400'
                             }
                         `}
                     >
-                        <div className="font-bold uppercase tracking-wider">All Systems GO</div>
-                        <div className="text-xs opacity-80 mt-1">Ready for re-entry confirmation</div>
+                        {allCautionsFixed ? (
+                            <>
+                                <div className="font-bold uppercase tracking-wider">All Systems GO</div>
+                                <div className="text-xs opacity-80 mt-1">Ready for re-entry confirmation</div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+                                    <AlertTriangle className="w-4 h-4" />
+                                    {unfixedCautions.length} CAUTION{unfixedCautions.length > 1 ? 'S' : ''} DETECTED
+                                </div>
+                                <div className="text-xs opacity-80 mt-1">Fix all issues before confirming</div>
+                            </>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -204,33 +291,40 @@ const ChecklistGame: React.FC<ChecklistGameProps> = ({ minigame, onComplete, the
             {/* Confirm Button */}
             <motion.button
                 onClick={handleConfirmAll}
-                disabled={!allChecked || isComplete}
+                disabled={!allChecked || !allCautionsFixed || isComplete}
                 className={`
                     w-full max-w-md py-4 rounded-xl text-lg font-bold uppercase tracking-wider
                     flex items-center justify-center gap-2 transition-all
                     ${isComplete
                         ? 'bg-green-600 text-white'
-                        : allChecked
+                        : allChecked && allCautionsFixed
                             ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                            : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : allChecked && !allCautionsFixed
+                                ? 'bg-amber-700 text-amber-200 cursor-not-allowed'
+                                : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                     }
                 `}
-                whileTap={allChecked && !isComplete ? { scale: 0.95 } : {}}
+                whileTap={allChecked && allCautionsFixed && !isComplete ? { scale: 0.95 } : {}}
             >
                 {isComplete ? (
                     <>
                         <Check className="w-5 h-5" />
                         GO for Re-Entry!
                     </>
-                ) : allChecked ? (
+                ) : allChecked && allCautionsFixed ? (
                     <>
                         <Rocket className="w-5 h-5" />
                         Confirm All Systems GO
                     </>
+                ) : allChecked && !allCautionsFixed ? (
+                    <>
+                        <AlertTriangle className="w-5 h-5" />
+                        Fix Cautions First!
+                    </>
                 ) : (
                     <>
                         <AlertTriangle className="w-5 h-5" />
-                        Verify All Systems First
+                        Verify All Systems
                     </>
                 )}
             </motion.button>
