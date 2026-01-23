@@ -109,18 +109,41 @@ story1Acts.push(
     createAct(s1, 21, "The Core", "Houston warns: 'Fifteen minutes to closeout.' The timeline is tight. You push the core tube into the regolith—the lunar soil is harder than expected, almost like wet sand frozen solid. You can only push it in a few inches. The sample will still tell us about billions of years of solar wind bombardment. Every grain is a time capsule.", undefined, "/images/apollo/act-21.png"),
     createAct(s1, 22, "Solar Wind", "You roll up the Swiss-built Solar Wind Composition experiment—a sheet of aluminum foil that has collected particles streaming from the sun for 77 minutes. On Earth, the atmosphere blocks this solar wind. Here, particles traveling 400 km/sec embed directly in the foil. Analysis will reveal helium-3, neon, and argon—materials that may one day fuel fusion reactors.", undefined, "/images/apollo/act-22.png"),
     createAct(s1, 23, "Contamination", "You hoist the rock boxes up the conveyor. Dust is everywhere. It is in the treads, on the suits, in the cabin. It smells like gunpowder. It is the smell of a dead world.", undefined, "/images/apollo/act-23.png"),
-    createAct(s1, 24, "Weight Limits", "Before closeout, the computer calculates: you are heavy. The ascent engine has no margin for error. You must jettison the non-essentials through the hatch: the overshoes, the empty PLSS backpacks, the armrests. The moon rocks stay—that's the whole point. The boots are expendable; the science is priceless.", undefined, "/images/apollo/act-24.png"),
+    createAct(s1, 24, "Weight Limits", "Before closeout, the computer calculates: you are heavy. The ascent engine has no margin for error. You must jettison the non-essentials through the hatch: the overshoes, the empty PLSS backpacks, the armrests. The moon rocks stay—that's the whole point. The boots are expendable; the science is priceless.", {
+        id: 'mg-story-1-24',
+        type: 'sequence',
+        theme: 'apollo',
+        question: "Closeout Procedure",
+        instructions: "Arrange the closeout steps in correct order.",
+        winningCondition: "Closeout complete.",
+        items: ["Seal rock boxes", "Jettison equipment", "Verify cabin pressure", "Close hatch"],
+        correctOrder: ["Seal rock boxes", "Jettison equipment", "Close hatch", "Verify cabin pressure"]
+    }, "/images/apollo/act-24.png"),
     createAct(s1, 25, "The Broken Switch", "Before the rest period, you notice it: the Engine Arm circuit breaker is broken. Buzz's PLSS backpack struck it while maneuvering in the cramped cabin. The plastic switch snapped clean off. Without it, the ascent engine cannot be armed. Without the engine, you die here. Eagle becomes a tomb.", undefined, "/images/apollo/act-25.png"),
     createAct(s1, 26, "The Pen Solution", "Aldrin finds a solution. A felt-tipped pen fits perfectly into the hole. It works. The engine is armed. It is a moment of pure, ridiculous human ingenuity.", undefined, "/images/apollo/act-26.png"),
     createAct(s1, 27, "Rest Period", "Mission Control orders a rest period. You try to sleep in hammocks strung across the tiny cabin—Buzz on the floor, you curled up on the ascent engine cover. It's 61°F, the pumps drone constantly, and earthlight streams through the window. Neither of you sleeps more than a few fitful hours. In seven hours, you launch.", undefined, "/images/apollo/act-27.png"),
-    createAct(s1, 28, "Ascent Ignition", "T-minus ten seconds. Houston confirms: 'You're GO for liftoff.' Your finger hovers over the PROCEED button. The computer displays 'PRO' — the final authorization code. One button press and the ascent engine fires, carrying you off the Moon. There is no abort. The descent stage stays behind forever—along with the flag, the experiments, and your footprints. You press the button. The engine ignites.", undefined, "/images/apollo/act-28.png"),
+    createAct(s1, 28, "Ascent Ignition", "T-minus ten seconds. Houston confirms: 'You're GO for liftoff.' Your finger hovers over the PROCEED button. The computer displays 'PRO' — the final authorization code. One button press and the ascent engine fires, carrying you off the Moon. There is no abort. The descent stage stays behind forever—along with the flag, the experiments, and your footprints.", {
+        id: 'mg-story-1-28',
+        type: 'memory',
+        theme: 'apollo',
+        question: "Ignition Sequence Memory",
+        instructions: "Remember and repeat the ignition sequence callouts.",
+        winningCondition: "Engine ignition confirmed."
+    }, "/images/apollo/act-28.png"),
     createAct(s1, 29, "Orbit Insertion", "The engine cuts off. You are in lunar orbit. The silence returns. Now begins the needle-in-a-haystack search for Columbia.", undefined, "/images/apollo/act-29.png"),
     createAct(s1, 30, "The Rendezvous", "A bright star appears on the horizon—Columbia. Mike Collins, who has been alone for 21 hours, orbiting while you walked on another world. 'I got you, Eagle,' his voice crackles with relief. He photographed the moon, tracked your progress, and prepared for this moment. Two spacecraft, three men, reuniting 60 miles above the lunar surface.", undefined, "/images/apollo/act-30.png")
 );
 
 // --- PHASE 4: RETURN (Acts 31-40) ---
 story1Acts.push(
-    createAct(s1, 31, "Docking", "Eagle approaches Columbia. Mike Collins watches through Columbia's window, calling out corrections. 'A little left... steady... you're looking good.' The docking probe slides home. Latches snap shut. Hard dock. You open the hatch and Mike Collins is there, grinning ear to ear. He's been completely alone longer than any human in history—during each pass behind the moon, he was cut off from all contact with Earth. 'Welcome back,' he says. The smell of moon dust fills Columbia.", undefined, "/images/apollo/act-31.png"),
+    createAct(s1, 31, "Docking", "Eagle approaches Columbia. Mike Collins watches through Columbia's window, calling out corrections. 'A little left... steady... you're looking good.' The approach must be perfectly timed—too fast and you'll damage both spacecraft, too slow and you'll miss the window.", {
+        id: 'mg-story-1-31',
+        type: 'centrifuge',
+        theme: 'apollo',
+        question: "Docking Approach",
+        instructions: "Time your approach rhythm. Hit the beats to close the distance smoothly.",
+        winningCondition: "Hard dock confirmed."
+    }, "/images/apollo/act-31.png"),
     createAct(s1, 32, "Jettison Eagle", "You transfer all the cargo to Columbia. You jettison the faithful lander. It drifts away, a golden spider against the black. Goodbye, old friend.", undefined, "/images/apollo/act-32.png"),
     createAct(s1, 33, "TEI Burn", "Trans-Earth Injection: the most critical burn of the mission. At 135:23:42, behind the Moon with no radio contact, the Service Propulsion System engine fires for 2 minutes 28 seconds. It accelerates you to 5,800 mph relative to the Moon—escape velocity. If the engine fails, there is no rescue possible. The engine burns perfectly. You're going home.", undefined, "/images/apollo/act-33.png"),
     createAct(s1, 34, "Earthrise", "As you orbit one last time, Earth rises over the lunar horizon—a blue and white marble suspended in infinite black. Apollo 8's 'Earthrise' photo helped spark the environmental movement. Now you see it yourself. All of human history, every war, every love, every invention, everything anyone has ever known—visible from here at arm's length. You feel a profound shift in perspective.", undefined, "/images/apollo/act-34.png"),

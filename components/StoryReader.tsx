@@ -595,7 +595,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
     }
 
     if (minigame.type === 'centrifuge') {
-        return <CentrifugeGame minigame={minigame} onComplete={onComplete} />;
+        return <CentrifugeGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
     if (minigame.type === 'grinding') {

@@ -5,49 +5,49 @@ Last updated: 2024-01-23
 
 ---
 
-## MINIGAME DUPLICATES - FIXED
+## MINIGAME OVERVIEW - ALL FIXED
 
-### STORY 1 - APOLLO (9 minigames total, no duplicates)
-
-| Act | Type | Status | Notes |
-|-----|------|--------|-------|
-| 3 | silo | ✅ OK | Verify Oxygen Mixture |
-| 4 | constellation | ✅ OK | Align Navigation Star |
-| 7 | cipher | ✅ OK | Decode 1202 Alarm |
-| 8 | quiz | ✅ FIXED | Landing Zone Selection (was silo duplicate) |
-| 12 | sample | ✅ OK | Collect Lunar Samples |
-| 18 | diagnosis | ✅ OK | Diagnose Suit |
-| 19 | scale | ✅ OK | Seismometer Leveling |
-| 20 | alignment | ✅ OK | Position Retroreflector |
-| 24 | (none) | ✅ FIXED | Weight Limits - removed duplicate sequence |
-| 28 | (none) | ✅ FIXED | Ascent Ignition - dramatic text only |
-| 31 | (none) | ✅ FIXED | Docking - dramatic text only |
-| 36 | checklist | ✅ OK | Re-entry Systems |
-
-### STORY 2 - ALCHEMIST (7 minigames total, no duplicates)
+### STORY 1 - APOLLO (12 minigames, ~1 per 3.3 acts)
 
 | Act | Type | Status | Notes |
 |-----|------|--------|-------|
-| 5 | mixing | ✅ OK | Rehydration solution |
-| 7 | quiz | ✅ OK | Moldy bread question |
-| 12 | ratcatcher | ✅ OK | Capture Specimen |
-| 16 | grinding | ✅ OK | Mask Filter |
-| 19 | lens | ✅ OK | Grind lenses |
-| 28 | microscope | ✅ FIXED | Identify mold (was quiz duplicate) |
-| 36 | sanitation | ✅ OK | Teach Protocols |
+| 3 | silo | ✅ | Verify Oxygen Mixture |
+| 4 | constellation | ✅ | Align Navigation Star |
+| 7 | cipher | ✅ | Decode 1202 Alarm |
+| 8 | quiz | ✅ | Landing Zone Selection |
+| 12 | sample | ✅ | Collect Lunar Samples |
+| 18 | diagnosis | ✅ | Diagnose Suit |
+| 19 | scale | ✅ | Seismometer Leveling |
+| 20 | alignment | ✅ | Position Retroreflector |
+| 24 | sequence | ✅ | Closeout Procedure |
+| 28 | memory | ✅ | Ignition Sequence Memory |
+| 31 | centrifuge | ✅ | Docking Approach |
+| 36 | checklist | ✅ | Re-entry Systems |
 
-### STORY 3 - ARCHIMEDES (8 minigames total, no duplicates)
+### STORY 2 - ALCHEMIST (7 minigames, ~1 per 5.7 acts)
 
 | Act | Type | Status | Notes |
 |-----|------|--------|-------|
-| 2 | circle | ✅ OK | Draw Perfect Circle |
-| 4 | defense | ✅ OK | Defend Harbor |
-| 10 | displacement | ✅ OK | Eureka Moment |
-| 16 | scale | ✅ OK | Fire Ships |
-| 20 | gears | ✅ OK | The Sun (mirrors) |
-| 25 | quiz | ✅ OK | Burning Light |
-| 28 | sequence | ✅ OK | The Screw |
-| 30 | catapult | ✅ OK | The Scorpion |
+| 5 | mixing | ✅ | Rehydration solution |
+| 7 | quiz | ✅ | Moldy bread question |
+| 12 | ratcatcher | ✅ | Capture Specimen |
+| 16 | grinding | ✅ | Mask Filter |
+| 19 | lens | ✅ | Grind lenses |
+| 28 | microscope | ✅ | Identify mold |
+| 36 | sanitation | ✅ | Teach Protocols |
+
+### STORY 3 - ARCHIMEDES (8 minigames, ~1 per 5 acts)
+
+| Act | Type | Status | Notes |
+|-----|------|--------|-------|
+| 2 | circle | ✅ | Draw Perfect Circle |
+| 4 | defense | ✅ | Defend Harbor |
+| 10 | displacement | ✅ | Eureka Moment |
+| 16 | scale | ✅ | Fire Ships |
+| 20 | gears | ✅ | The Sun (mirrors) |
+| 25 | quiz | ✅ | Burning Light |
+| 28 | sequence | ✅ | The Screw |
+| 30 | catapult | ✅ | The Scorpion |
 
 ---
 
@@ -69,14 +69,12 @@ Example prompt:
 ## COMPLETED TASKS
 
 - [x] Fix act-22 Solar Wind image (pixel art)
-- [x] Fix act-27 Rest Period image (pixel art)
-- [x] Generate all images act-28 to act-40 (pixel art)
-- [x] Fix Apollo Act 8 minigame (silo → quiz)
-- [x] Fix Apollo Act 24 (removed minigame, fixed story flow)
-- [x] Fix Apollo Act 28 (removed duplicate cipher)
-- [x] Fix Apollo Act 31 (removed duplicate constellation)
+- [x] Fix act-27 to act-40 images (pixel art)
+- [x] Fix Apollo minigame duplicates
 - [x] Fix Alchemist Act 28 minigame (quiz → microscope)
+- [x] Maintain minigame density (~1 per 5 acts)
 - [x] Fix story flow: Weight Limits → Broken Switch → Pen → Rest → Ascent
+- [x] Pass theme to CentrifugeGame in StoryReader
 - [x] Created CLAUDE.md with guidelines
 - [x] Created TASKS.md for tracking
 
@@ -85,18 +83,18 @@ Example prompt:
 ## PENDING TASKS
 
 1. [ ] Review Apollo images act-1 to act-26 for pixel art consistency
-2. [ ] Test all minigames work correctly after changes
+2. [ ] Test all minigames work correctly
 3. [ ] Review Alchemist story images for pixel art style
 4. [ ] Review Archimedes story images for pixel art style
 
 ---
 
-## MINIGAME TYPES REFERENCE
+## MINIGAME TYPES BY STORY
 
-**Used in Apollo:** silo, constellation, cipher, quiz, sample, diagnosis, scale, alignment, checklist
+**Apollo:** silo, constellation, cipher, quiz, sample, diagnosis, scale, alignment, sequence, memory, centrifuge, checklist
 
-**Used in Alchemist:** mixing, quiz, ratcatcher, grinding, lens, microscope, sanitation
+**Alchemist:** mixing, quiz, ratcatcher, grinding, lens, microscope, sanitation
 
-**Used in Archimedes:** circle, defense, displacement, scale, gears, quiz, sequence, catapult
+**Archimedes:** circle, defense, displacement, scale, gears, quiz, sequence, catapult
 
-**Available/Unused:** timeline, symbolmatching, mirror, chemistry, debate, ritual, tangram, memory, lenscrafting, centrifuge, triage
+**Unused:** timeline, symbolmatching, mirror, chemistry, debate, ritual, tangram, lenscrafting, triage
