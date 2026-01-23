@@ -21,11 +21,12 @@ const s1 = 'story-1';
 
 // --- PHASE 1: THE JOURNEY (Acts 1-10) ---
 story1Acts.push(
-    createAct(s1, 1, "The Shoulders of Giants", "July 16, 1969. Cape Kennedy. You are Neil Armstrong, commander of Apollo 11. The humidity clings to your flight suit as you stand on the gantry. The Saturn V groans beneath you, fully fueled—7.5 million pounds of explosive potential. Behind you are Buzz Aldrin and Mike Collins. Three men. One mission. The eyes of the world are watching.", undefined, "/images/apollo/act-1.png"),
+    createAct(s1, 1, "The Shoulders of Giants", "July 16, 1969. Cape Kennedy. You are Neil Armstrong, commander of Apollo 11. The humidity clings to your flight suit as you stand on the gantry. The Saturn V groans beneath you, fully fueled—6.2 million pounds of rocket and propellant. Behind you are Buzz Aldrin and Mike Collins. Three men. One mission. The eyes of the world are watching.", undefined, "/images/apollo/act-1.png"),
     createAct(s1, 2, "Ignition", "9:32 AM EDT. The five F-1 engines ignite in sequence, building to 7.6 million pounds of thrust—the most powerful machine ever built. The Saturn V consumes 20 tons of fuel per second. The vibration rattles your teeth; your vision blurs from the 4G acceleration. In 12 minutes, you will be in orbit. In 76 hours, you will be on the Moon.", undefined, "/images/apollo/act-2.png"),
     createAct(s1, 3, "Orbit Insertion", "Silence. Zero G. The engines cut off. But Houston needs a systems check before the TLI burn. The fuel mixture indicators are fluctuating.", {
         id: 'mg-story-1-3',
         type: 'silo',
+        theme: 'apollo',
         question: "Verify Oxygen Mixture",
         instructions: "Adjust the regulator to the optimal percentage (95%).",
         winningCondition: "Stable Atmosphere Achieved"
@@ -33,6 +34,7 @@ story1Acts.push(
     createAct(s1, 4, "Translunar Injection", "The third-stage S-IVB fires for 5 minutes 47 seconds, accelerating you to 24,500 mph—escape velocity. Earth shrinks behind you. The onboard Apollo Guidance Computer, with just 74 kilobytes of memory, needs periodic realignment. You sight through the sextant, finding guide stars like ancient mariners. Navigation in space uses the same principles humans have used for millennia.", {
         id: 'mg-story-1-4',
         type: 'constellation',
+        theme: 'apollo',
         question: "Align Navigation Star",
         instructions: "Trace the constellation path to calibrate the guidance computer.",
         winningCondition: "Guidance Calibrated"
@@ -42,6 +44,7 @@ story1Acts.push(
     createAct(s1, 7, "Undocking", "You and Buzz float through the tunnel into the Lunar Module 'Eagle'. Mike Collins stays behind in Columbia—he will orbit alone for the next 21 hours. 'See you on the flip side,' he says. The separation is smooth, but then the alarms blare. '1202 Alarm'. The computer is overloaded.", {
         id: 'mg-story-1-7',
         type: 'cipher',
+        theme: 'apollo',
         question: "Decode the 1202 Alarm",
         instructions: "Enter the override code: EXECUTIVE OVERFLOW",
         winningCondition: "Buffer Cleared",
@@ -70,6 +73,7 @@ story1Acts.push(
     createAct(s1, 12, "Contingency Sample", "First rule: get a sample. If the engine explodes now, at least we bring something home. You grab the scoop and contingency sample bags. Each sample must be carefully collected and sealed to preserve the lunar vacuum. The bag seals with a satisfying snap.", {
         id: 'mg-story-1-12',
         type: 'sample',
+        theme: 'apollo',
         question: "Collect Lunar Samples",
         instructions: "Gather rock and soil samples, then seal the container for return to Earth.",
         winningCondition: "Samples Secured"
@@ -78,7 +82,7 @@ story1Acts.push(
     createAct(s1, 14, "Mobility", "Walking is impossible in the bulky A7L suit. You weigh 360 pounds on Earth with full gear; here, just 60. You learn to 'lope'—a bounding gait that covers ground efficiently. But momentum still applies. If you fall, you must roll onto all fours to stand; the suit can't bend at the waist. A suit breach at -250°F in vacuum gives you 15 seconds of consciousness.", undefined, "/images/apollo/act-14.png"),
     createAct(s1, 15, "The Flag", "The telescoping rod jams—the latch mechanism fails. You and Buzz hammer the pole in using rock hammers, but only manage 8 inches into the surprisingly hard regolith. A horizontal rod keeps the flag extended since there's no wind. Congress mandated an American flag, but NASA insisted on no territorial claim: international law forbids any nation from owning celestial bodies.", undefined, "/images/apollo/act-15.png"),
     createAct(s1, 16, "The Call", "'Hello Neil and Buzz, I am talking to you by telephone from the Oval Office.' President Nixon's voice arrives 1.3 seconds after he speaks—the time for radio waves to cross 238,855 miles. 'For one priceless moment, all the people on this Earth are truly one.' Speech writer William Safire had also prepared a different speech, in case you never came home.", undefined, "/images/apollo/act-16.png"),
-    createAct(s1, 17, "EASEP Deployment", "The Early Apollo Scientific Experiments Package—EASEP—is surprisingly heavy even in 1/6th gravity. You carry the two instruments to a flat spot 50 feet from Eagle: the Passive Seismic Experiment to detect moonquakes, and the Laser Ranging Retroreflector. Future missions will deploy the full ALSEP suite, but you are the first. You are proving it can be done.", undefined, "/images/apollo/act-17.png"),
+    createAct(s1, 17, "EASEP Deployment", "The Early Apollo Scientific Experiments Package—EASEP—is surprisingly heavy even in one-sixth gravity. You carry the two instruments to a flat spot 50 feet from Eagle: the Passive Seismic Experiment to detect moonquakes, and the Laser Ranging Retroreflector. Future missions will deploy the full ALSEP suite, but you are the first. You are proving it can be done.", undefined, "/images/apollo/act-17.png"),
     createAct(s1, 18, "Suit Integrity", "Your PLSS warning light flickers. Pressure fluctuation? You stop breathing for a second. The sound of the pumps is your only companion. You must diagnose the loop. Is it a sensor error or a leak?", {
         id: 'mg-story-1-18',
         type: 'diagnosis',
@@ -98,6 +102,7 @@ story1Acts.push(
     createAct(s1, 20, "Laser Ranging", "The Lunar Ranging Retroreflector. A grid of 100 corner-cube prisms that will reflect laser beams back to Earth. You position it on the surface, adjusting the tilt until it points toward home. Scientists will bounce lasers off this for the next 50 years.", {
         id: 'mg-story-1-20',
         type: 'alignment',
+        theme: 'apollo',
         question: "Position the Retroreflector",
         instructions: "Adjust the reflector's tilt until Earth is centered in the alignment scope.",
         winningCondition: "Reflector Aligned"
@@ -157,7 +162,7 @@ story1Acts.push(
         winningCondition: "All Systems GO"
     }, "/images/apollo/act-36.png"),
     createAct(s1, 37, "Blackout", "You hit the atmosphere at 24,677 mph—faster than a rifle bullet. The heat shield reaches 5,000°F as air molecules compress and ionize. For 3 minutes, this ionized plasma blocks all radio signals. Houston sees only silence. Inside, you're pushed into your couch at 6.5 Gs while fire streams past the windows. The AVCO heat shield ablates away, carrying the heat with it.", undefined, "/images/apollo/act-37.png"),
-    createAct(s1, 38, "Drogues Deployed", "The radio crackles. 'We hear you!' The drogue chutes pop out, jerking the capsule violent. The spin stops. You are falling through the clouds.", undefined, "/images/apollo/act-38.png"),
+    createAct(s1, 38, "Drogues Deployed", "The radio crackles. 'We hear you!' The drogue chutes pop out, jerking the capsule violently. The spin stops. You are falling through the clouds.", undefined, "/images/apollo/act-38.png"),
     createAct(s1, 39, "Splashdown", "The three main chutes open. Orange flowers in the blue sky. You hit the water with a massive jolt. The capsule flips over, then rights itself. You are home.", undefined, "/images/apollo/act-39.png"),
     createAct(s1, 40, "Hornet + 3", "Navy divers attach the flotation collar. You climb out, don biological isolation garments—NASA isn't taking chances with unknown lunar microbes. Helicopter 66 delivers you to the USS Hornet. President Nixon watches through the window of the Mobile Quarantine Facility. You'll spend 21 days in isolation. But you made it. Three men went to the Moon. Three men came home.", undefined, "/images/apollo/act-40.png")
 );
