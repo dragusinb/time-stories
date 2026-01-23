@@ -427,6 +427,14 @@ export function StoryReader({ story }: StoryReaderProps) {
 }
 
 function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: Minigame; onComplete: (result: boolean | number) => void; theme?: 'apollo' | 'ancient' | 'medieval' }) {
+    // Helper to get the effective theme for minigames that don't support 'sci-fi'
+    const getEffectiveTheme = (): 'apollo' | 'ancient' | 'medieval' => {
+        if (minigame.theme === 'apollo' || minigame.theme === 'ancient' || minigame.theme === 'medieval') {
+            return minigame.theme;
+        }
+        return theme; // Fall back to story theme
+    };
+    const effectiveTheme = getEffectiveTheme();
     if (minigame.type === 'memory') {
         return (
             <MemoryGame
@@ -511,7 +519,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
     }
 
     if (minigame.type === 'scale') {
-        return <ScaleGame minigame={minigame} onComplete={onComplete} />;
+        return <ScaleGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
     if (minigame.type === 'mirror') {
@@ -543,7 +551,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
     }
 
     if (minigame.type === 'silo') {
-        return <SiloGame minigame={minigame} onComplete={onComplete} />;
+        return <SiloGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
 
@@ -563,7 +571,7 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
 
 
     if (minigame.type === 'constellation') {
-        return <ConstellationGame minigame={minigame} onComplete={onComplete} />;
+        return <ConstellationGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
     if (minigame.type === 'chemistry') {
@@ -571,11 +579,11 @@ function MinigameView({ minigame, onComplete, theme = 'medieval' }: { minigame: 
     }
 
     if (minigame.type === 'diagnosis') {
-        return <DiagnosisGame minigame={minigame} onComplete={onComplete} />;
+        return <DiagnosisGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
     if (minigame.type === 'triage') {
-        return <TriageGame minigame={minigame} onComplete={onComplete} />;
+        return <TriageGame minigame={minigame} onComplete={onComplete} theme={effectiveTheme} />;
     }
 
     if (minigame.type === 'sanitation') {

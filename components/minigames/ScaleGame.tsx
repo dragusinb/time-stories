@@ -87,20 +87,32 @@ export const ScaleGame: React.FC<ScaleGameProps> = ({ minigame, onComplete, them
     };
 
     const isApollo = theme === 'apollo';
+    const isAncient = theme === 'ancient';
+
+    const getTitle = () => {
+        if (isApollo) return 'EASEP LEVELING';
+        if (isAncient) return 'The Balance';
+        return 'The Scale';
+    };
 
     return (
         <div className={`flex flex-col items-center space-y-8 p-8 rounded-lg border-4 shadow-2xl relative overflow-hidden transition-all
-            ${isApollo ? 'bg-black border-green-900 font-mono' : 'bg-slate-900 border-amber-900/50 font-pixel'}
+            ${isApollo
+                ? 'bg-black border-green-900 font-mono'
+                : isAncient
+                    ? 'bg-[#1a110d] border-[#5e4026] font-serif'
+                    : 'bg-slate-900 border-amber-900/50 font-pixel'}
         `}>
             {/* Background Texture */}
-            {!isApollo && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>}
+            {!isApollo && !isAncient && <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>}
             {isApollo && <div className="absolute inset-0 opacity-20 pointer-events-none bg-[linear-gradient(rgba(0,255,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.1)_1px,transparent_1px)] bg-[size:20px_20px]"></div>}
+            {isAncient && <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle,rgba(139,90,43,0.3)_1px,transparent_1px)] bg-[size:15px_15px]"></div>}
 
             <div className="text-center relative z-10">
-                <h3 className={`text-xl mb-2 tracking-[0.3em] uppercase border-b pb-2 ${isApollo ? 'text-green-500 border-green-900' : 'text-amber-500 border-amber-500/30'}`}>
-                    {isApollo ? 'EASEP LEVELING' : 'The Golden Ratio'}
+                <h3 className={`text-xl mb-2 tracking-[0.3em] uppercase border-b pb-2 ${isApollo ? 'text-green-500 border-green-900' : isAncient ? 'text-[#e6ccb2] border-[#5e4026]' : 'text-amber-500 border-amber-500/30'}`}>
+                    {getTitle()}
                 </h3>
-                <p className={`text-[10px] uppercase tracking-wider ${isApollo ? 'text-green-400 font-bold' : 'text-slate-400 font-mono'}`}>{minigame.instructions}</p>
+                <p className={`text-[10px] uppercase tracking-wider ${isApollo ? 'text-green-400 font-bold' : isAncient ? 'text-[#c9a66b]' : 'text-slate-400 font-mono'}`}>{minigame.instructions}</p>
             </div>
 
             {/* Visualization */}
@@ -208,7 +220,13 @@ export const ScaleGame: React.FC<ScaleGameProps> = ({ minigame, onComplete, them
                 )}
             </div>
 
-            <div className={`h-6 font-bold font-mono text-xs uppercase tracking-widest ${Math.abs(leftWeight - rightWeight) === 0 ? 'text-green-400 animate-pulse' : (isApollo ? 'text-green-700' : 'text-amber-500')
+            <div className={`h-6 font-bold font-mono text-xs uppercase tracking-widest ${Math.abs(leftWeight - rightWeight) === 0
+                ? 'text-green-400 animate-pulse'
+                : isApollo
+                    ? 'text-green-700'
+                    : isAncient
+                        ? 'text-[#c9a66b]'
+                        : 'text-amber-500'
                 }`}>
                 {message}
             </div>
@@ -220,24 +238,28 @@ export const ScaleGame: React.FC<ScaleGameProps> = ({ minigame, onComplete, them
                     className={`flex-1 font-mono text-xs py-3 rounded shadow-md active:translate-y-0.5 transition-all
                         ${isApollo
                             ? 'bg-red-900/40 hover:bg-red-900/60 border-2 border-red-800 text-red-200'
-                            : 'bg-red-900/40 hover:bg-red-900/60 border-2 border-red-800 text-red-200'}
+                            : isAncient
+                                ? 'bg-[#3d2817] hover:bg-[#4d3827] border-2 border-[#5e4026] text-[#c9a66b]'
+                                : 'bg-red-900/40 hover:bg-red-900/60 border-2 border-red-800 text-red-200'}
                     `}
                 >
-                    {isApollo ? 'LOWER LEFT' : 'REMOVE WEIGHT'}
+                    {isApollo ? 'LOWER LEFT' : 'REMOVE'}
                 </Button>
                 <div className="flex flex-col items-center justify-center">
-                    <span className="text-[10px] text-slate-500 font-mono mb-1">{isApollo ? 'OFFSET' : 'CURRENT'}</span>
-                    <span className={`text-xl font-bold font-mono ${isApollo ? 'text-green-500' : 'text-yellow-500'}`}>{goldPieces}</span>
+                    <span className={`text-[10px] font-mono mb-1 ${isAncient ? 'text-[#8b6914]' : 'text-slate-500'}`}>{isApollo ? 'OFFSET' : isAncient ? 'BALLAST' : 'CURRENT'}</span>
+                    <span className={`text-xl font-bold font-mono ${isApollo ? 'text-green-500' : isAncient ? 'text-[#e6ccb2]' : 'text-yellow-500'}`}>{goldPieces}</span>
                 </div>
                 <Button
                     onClick={addGold}
                     className={`flex-1 font-bold font-mono text-xs py-3 rounded shadow-lg active:translate-y-1 active:border-b-0 transition-all
                         ${isApollo
                             ? 'bg-green-600 hover:bg-green-500 border-b-4 border-green-800 text-green-100'
-                            : 'bg-amber-600 hover:bg-amber-500 border-b-4 border-amber-800 text-amber-100'}
+                            : isAncient
+                                ? 'bg-[#5e4026] hover:bg-[#704d2e] border-b-4 border-[#3d2817] text-[#e6ccb2]'
+                                : 'bg-amber-600 hover:bg-amber-500 border-b-4 border-amber-800 text-amber-100'}
                     `}
                 >
-                    {isApollo ? 'RAISE LEFT' : 'ADD WEIGHT'}
+                    {isApollo ? 'RAISE LEFT' : 'ADD'}
                 </Button>
             </div>
         </div>
