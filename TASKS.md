@@ -84,7 +84,7 @@ Example prompt:
 
 ## PENDING TASKS
 
-1. [ ] Review Apollo images act-1 to act-26 for pixel art consistency
+1. [x] Review Apollo images act-1 to act-26 for pixel art consistency (acts 5-9 regenerated)
 2. [ ] Test all minigames work correctly
 3. [ ] Review Alchemist story images for pixel art style
 4. [ ] Review Archimedes story images for pixel art style
